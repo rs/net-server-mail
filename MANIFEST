@@ -8,3 +8,5 @@ MANIFEST
 README
 t/smtp.t
 t/lmtp.t
+eg/smtp-gateway.pl
+eg/smtpd-select.pl
