@@ -82,11 +82,20 @@ sub init
         $options->{lc($_[$i])} = $_[$i + 1];
     }
 
-    unless((defined $options->{handle_in} && defined $options->{handle_out})
-        or defined $options->{socket})
+    if(defined $options->{handle_in} && defined $options->{handle_out})
     {
-        $options->{handle_in}  = \*STDIN;
-        $options->{handle_out} = \*STDOUT;
+        $self->{in}  = $options->{handle_in};
+        $self->{out} = $options->{handle_out};
+    }
+    elsif(defined $options->{'socket'})
+    {
+        $self->{in}  = $options->{'socket'};
+        $self->{out} = $options->{'socket'};
+    }
+    else
+    {
+        $self->{in}  = \*STDIN;
+        $self->{out} = \*STDOUT;
     }
 
     return $self;
@@ -233,22 +242,22 @@ sub process
 {
     my($self) = @_;
 
-    my $in  = $self->get_in;
+    my $in  = $self->{in};
     my $sel = new IO::Select;
     $sel->add($in);
     
     $self->banner;
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
-        $_ = <STDIN>;
+        $_ = <$in>;
         chomp;
         s/^\s+|\s+$//g;
         next unless length;
-        my($cmd, @args) = split;
+        my($cmd, $args) = split(' ', $_, 2);
         
         if(exists $self->{cmd}->{uc $cmd})
         {
-            my $rv = &{$self->{cmd}->{uc $cmd}}($self, @args);
+            my $rv = &{$self->{cmd}->{uc $cmd}}($self, $args);
             # close connection if command return something
             return $rv if(defined $rv);
         }
@@ -265,7 +274,7 @@ sub process
 sub reply
 {
     my($self, $code, $msg) = @_;
-    my $out = $self->get_out;
+    my $out = $self->{out};
     # tempo on error
     sleep $self->{options}->{error_sleep_time}
         if($code >= 400 && $self->{options}->{error_sleep_time});
@@ -275,47 +284,13 @@ sub reply
         unless defined $msg;
 
     # handle multiple lines
-    my @lines = split(/\n\r?/, $msg);
+    my @lines = split(/\r?\n/, $msg);
     for(my $i = 0; $i < @lines; $i++)
     {
         # RFC say that all lines but the last have to
         # split the code and the message with a dash (-)
         my $sep = $i == $#lines ? ' ' : '-';
-        print $out "$code$sep$lines[$i]\n\r";
-    }
-}
-
-sub get_in
-{
-    my($self) = @_;
-    if(defined $self->{options}->{handle_in})
-    {
-        return $self->{options}->{handle_in};
-    }
-    elsif(defined $self->{options}->{socket})
-    {
-        return $self->{options}->{socket};
-    }
-    else
-    {
-        croak "no handle to read";
-    }
-}
-
-sub get_out
-{
-    my($self) = @_;
-    if(defined $self->{options}->{handle_out})
-    {
-        return $self->{options}->{handle_out};
-    }
-    elsif(defined $self->{options}->{socket})
-    {
-        return $self->{options}->{socket};
-    }
-    else
-    {
-        croak "no handle to write";
+        print $out "$code$sep$lines[$i]\r\n";
     }
 }
 

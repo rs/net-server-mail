@@ -97,9 +97,7 @@ sub helo
 
 sub ehlo
 {
-    my($self, $hostname) = @_;
-    $self->reply(502, 'Command not implemented');
-    return;
+    helo(@_);
 }
 
 sub noop
@@ -142,7 +140,7 @@ sub help
 
 sub mail
 {
-    my($self, $from, $address, @options) = @_;
+    my($self, $args) = @_;
 
     unless($self->step_reverse_path)
     {
@@ -150,7 +148,8 @@ sub mail
         return;
     }
 
-    unless(defined $from && lc $from eq 'from:')
+
+    unless($args =~ s/^from:\s*//i)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');
         return;
@@ -162,7 +161,9 @@ sub mail
         return;
     }
 
-    unless($self->mail_options)
+    my($address, @options) = split(' ', $args);
+
+    unless($self->mail_options(@options))
     {
         return;
     }
@@ -206,20 +207,23 @@ sub mail_options
 
 sub rcpt
 {
-    my($self, $to, $address, @options) = @_;
+    my($self, $args) = @_;
+
     unless($self->step_forward_path)
     {
         $self->reply(503, 'Bad sequence of commands');
         return;
     }
     
-    unless(defined $to && lc $to eq 'to:')
+    unless($args =~ s/^to:\s*//i)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');
         return;
     }
 
-    unless($self->mail_options)
+    my($address, @options) = split(' ', $args);
+
+    unless($self->mail_options(@options))
     {
         return;
     }
@@ -254,7 +258,7 @@ sub rcpt_options
 
 sub data
 {
-    my($self, @args) = @_;
+    my($self, $args) = @_;
 
     unless($self->step_maildata_path)
     {
@@ -262,7 +266,7 @@ sub data
         return;
     }
     
-    if(@args)
+    if(defined $args && length $args)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');
         return;
@@ -270,12 +274,12 @@ sub data
 
     $self->reply(354, 'Start mail input; end with <CRLF>.<CRLF>');
 
-    my $in = $self->get_in;
+    my $in = $self->{in};
 
     my $data;
-    while(<$in>)
+    while($_=<$in>)
     {
-        last if(/^\.\n\r?$/);
+        last if(/^\.\r?\n$/);
         
         # RFC 821 compliance.
         s/^\.//;
