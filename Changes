@@ -1,3 +1,9 @@
+2004-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.9
+
+	* Fix CPAN bug #9014
+		
 2003-04-06  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.8
