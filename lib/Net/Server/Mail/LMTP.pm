@@ -108,7 +108,7 @@ argument and specific callback's arguments.
 
 =head2 LHLO
 
-Same as ESMTP EHLO, please see L<Net::Server::Mail::LMTP>.
+Same as ESMTP EHLO, please see L<Net::Server::Mail::ESMTP>.
 
 =cut
 
@@ -130,6 +130,7 @@ sub lhlo
         push(@extends, join(' ', $extend->keyword, $extend->parameter));
     }
 
+    $self->extend_mode(1);
     $self->make_event
     (
         name => 'LHLO',
