@@ -245,31 +245,48 @@ sub make_event
     {
         if(defined $success && $success)
         {
-            if(defined $args{'success_reply'} && ref $args{'success_reply'} eq 'ARRAY')
-            {
-                ($code, $msg) = @{$args{'success_reply'}};
-            }
-            else
-            {
-                $code = 250;
-            }
+            ($code, $msg) =
+              $self->get_default_reply($args{'success_reply'}, 250);
         }
         else
         {
-            if(defined $args{'failure_reply'} && ref $args{'failure_reply'} eq 'ARRAY')
-            {
-                ($code, $msg) = @{$args{'failure_reply'}};
-            }
-            else
-            {
-                $code = 550;
-            }
+            ($code, $msg) =
+              $self->get_default_reply($args{'failure_reply'}, 550);
         }
     }
 
-    $self->handle_reply($name, $success, $code, $msg);
+    $self->handle_reply($name, $success, $code, $msg)
+      if defined $code and length $code;
 
     return $success;
+}
+
+sub get_default_reply
+{
+    my($self, $config, $default) = @_;
+
+    my($code, $msg);
+    if(defined $config)
+    {
+        if(ref $config eq 'ARRAY')
+        {
+            ($code, $msg) = @$config;
+        }
+        elsif(not ref $config)
+        {
+            $code = $config;
+        }
+        else
+        {
+            confess("unexpected format for reply");
+        }
+    }
+    else
+    {
+        $code = $default;
+    }
+
+    return($code, $msg);
 }
 
 sub handle_reply
@@ -355,6 +372,26 @@ sub list_verb
     return keys %{$self->{verb}};
 }
 
+
+sub next_input_to
+{
+    my($self, $method_ref) = @_;
+    $self->{next_input} = $method_ref
+      if(defined $method_ref);
+    return $self->{next_input}
+}
+
+sub tell_next_input_method
+{
+    my($self, $input) = @_;
+    # calling the method and reinitialize. Note: we have to reinit
+    # before calling the code, because code can resetup this variable.
+    my $code = $self->{next_input};
+    undef $self->{next_input};
+    my $rv = &{$code}($self, $input);
+    return $rv;
+}
+
 =pod
 
 =head2 process
@@ -381,13 +418,33 @@ sub process
         $in->blocking(0);
         $_ = join '', <$in>;
         $in->blocking(1);
-        next unless defined;
-        my $rv = $self->{process_operation}($self, $_);
-        # if $rv is defined, we have to close the connection
-        return $rv if defined $rv;
+        if(defined $self->next_input_to())
+        {
+            $self->tell_next_input_method($_);
+        }
+        else
+        {
+            next unless defined;
+            my $rv = $self->{process_operation}($self, $_);
+            # if $rv is defined, we have to close the connection
+            return $rv if defined $rv;
+        }
     }
 
     $self->timeout;
+}
+
+sub process_once
+{
+    my($self, $operation) = @_;
+    if($self->direct_input_to())
+    {
+        return $self->tell_next_input_method($operation);
+    }
+    else
+    {
+        return $self->{process_operation}($self, $operation);
+    }
 }
 
 sub process_operation
