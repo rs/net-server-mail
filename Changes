@@ -1,3 +1,14 @@
+2003-01-25  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.4
+
+	* Fix a bug in constructor in handle class check
+
+	* Fix a dead loop in connection handling when client close the
+	connection before the end of transaction
+
+	* Fix a bug in DATA command that prevent to detect the end of data
+
 2003-01-01  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.03

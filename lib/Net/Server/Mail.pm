@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.03';
+$Net::Server::Mail::VERSION = '0.04';
 
 =pod
 
