@@ -1,3 +1,13 @@
+2003-03-14  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.7
+
+	* Fix a major bug in data-finished that prevent several recipients to be
+	proceed in the LDAP module
+
+	* Fix a minor bug in data-finished that prevent to reuse the session if the
+	DATA command was failed
+
 2003-02-06  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.6
