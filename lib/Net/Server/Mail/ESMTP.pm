@@ -238,13 +238,6 @@ sub helo
     $self->SUPER::helo($hostname);
 }
 
-sub rset
-{
-    my($self) = @_;
-    $self->{extend_mode} = 0;
-    $self->SUPER::rset();
-}
-
 sub handle_options
 {
     my($self, $verb, $address, @options) = @_;
