@@ -491,7 +491,7 @@ sub process
         }
         
         # do not go into an infinit loop if client close the connection
-        last unless $_;
+        last unless defined $_;
 
         if(defined $self->next_input_to())
         {
