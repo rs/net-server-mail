@@ -581,7 +581,7 @@ sub data_part
             return;
         }
         $self->{_data} .= $1;
-        $self->data_finished();
+        return $self->data_finished();
     }
 
     $self->make_event
