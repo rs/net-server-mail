@@ -30,7 +30,8 @@ Net::Server::Mail - Class to easily create a mail server
         my $smtp = new Net::Server::Mail::SMTP socket => $conn;
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
-        $smtp->process;
+        $smtp->process();
+	$conn->close();
     }
 
     sub validate_recipient

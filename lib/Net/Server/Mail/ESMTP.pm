@@ -28,7 +28,8 @@ Net::Server::Mail::ESMTP - A module to implement the ESMTP protocole
         # adding some handlers
         $esmtp->set_callback(RCPT => \&validate_recipient);
         $esmtp->set_callback(DATA => \&queue_message);
-        $esmtp->process;
+        $esmtp->process();
+	$conn->close()
     }
 
     sub validate_recipient
