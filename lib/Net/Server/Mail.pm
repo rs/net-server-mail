@@ -14,25 +14,25 @@ $Net::Server::Mail::VERSION = '0.01';
 
 =head1 NAME
 
-Net::Server::Mail - Class to easly create mail server
+Net::Server::Mail - Class to easily create a mail server
 
 =head1 SYNOPSIS
 
     use Net::Server::Mail::SMTP;
 
-    my @local_domains = qw(exemple.com foobar.com);
+    my @local_domains = qw(example.com example.org);
     my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
     
     my $conn;
     while($conn = $server->accept)
     {
         my $smtp = new Net::Server::Mail::SMTP socket => $conn;
-        $smtp->set_callback(RCPT => \&valide_recipient);
+        $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process;
     }
 
-    sub valide_recipient
+    sub validate_recipient
     {
         my($session, $recipient) = @_;
         
@@ -72,9 +72,10 @@ Net::Server::Mail - Class to easly create mail server
 
 =head1 DESCRIPTION
 
-This class is the base class for mail service protocols like
-SMTP, ESMTP and LMTP. Look at manual page for each of these
-sub-modules.
+This class is the base class for mail service protocols such as
+B<Net::Server::Mail::SMTP>, B<Net::Server::Mail::ESMTP> and
+B<Net::Server::Mail::LMTP>. Refer to the documentation provided
+with each of these modules.
 
 =head1 METHODS
 
@@ -86,25 +87,31 @@ options:
 
 =over 4
 
-=item handle_in and handle_out
+=item handle_in
 
-Tell on which handle server read and write commands.
-(defaults are STDIN/STDOUT)
+Sets the input handle, from which the server reads data. Defaults to
+STDIN.
+
+=item handle_out
+
+Sets the output handle, to which the server writes data. Defaults to
+STDOUT.
 
 =item socket
 
-Instead of handle, read/write on a socket 
+Sets a socket to be used for server reads and writes instead of
+handles.
 
 =item error_sleep_time
 
-Number of seconds to wait for before print the error message,
-this can avoid some DoS attack by flooding server with bogus
-commands. A value of 0 unactivate this feature. (default is 0)
+Number of seconds to wait for before printing an error message. This
+avoids some DoS attacks that attempt to flood the server with bogus
+commands. A value of 0 turns this feature off. Defaults to 0.
 
 =item idle_timeout
 
-Number of seconds of idle to wait before close connection. A value
-of 0 unactivate this feature. (default is 0)
+Number of seconds a connection must remain idle before it is closed.
+A value of 0 turns this feature off. Defaults to 0.
 
 =back
 
@@ -240,7 +247,10 @@ sub callback
 
 =head2 set_callback
 
-($success, $code, $msg) = $obj->set_callback(VERB, \&function_reference)
+  ($success, $code, $msg) = $obj->set_callback(VERB, \&function)>
+
+Sets the callback code to be called on a particular event. The function should
+return 1 to 3 values: (success, [return_code, ["message"]]).
 
     $mailserver->set_callback
     (
@@ -257,10 +267,6 @@ sub callback
             }
         }
     );
-
-Setup callback code to call on a particulare event.
-
-Your code have to return 1 to 3 values : (successnes, [return_code, ["message"]])
 
 =cut
 
@@ -297,7 +303,7 @@ sub list_verb
 
     $mailserver->process;
 
-Begin a new session
+Start a new session.
 
 =cut
 
@@ -312,7 +318,7 @@ sub process
     $self->banner;
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
-        # switching to non-blocking socket to handle PIPELINING
+        # switch to non-blocking socket to handle PIPELINING
         # ESMTP extension. See RFC 2920 for more details.
         $in->blocking(0);
         $_ = join '', <$in>;
@@ -353,7 +359,7 @@ sub process_command
     }
     else
     {
-        $self->reply(500, 'Syntax error, command unrecognized');
+        $self->reply(500, 'Syntax error: unrecognized command');
         return;
     }
 }
@@ -393,7 +399,7 @@ sub reply
     }
     for(my $i = 0; $i < @lines; $i++)
     {
-        # RFC say that all lines but the last have to
+        # RFC says that all lines but the last must
         # split the code and the message with a dash (-)
         my $sep = $i == $#lines ? ' ' : '-';
         print $out "$code$sep$lines[$i]\r\n";

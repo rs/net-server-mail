@@ -103,8 +103,8 @@ sub ehlo
         arguments => [$hostname, \@extends],
         on_success => sub
         {
-            # conforming to RFC, HELO ensure "that both the SMTP client and the
-            # SMTP server are in the initial state"
+            # according to the RFC, HELO ensures "that both the SMTP client
+            # and the SMTP server are in the initial state"
             $self->{extend_mode} = 1;
             $self->step_reverse_path(1);
             $self->step_forward_path(0);
