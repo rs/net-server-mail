@@ -2,14 +2,12 @@ package Net::Server::Mail::ESMTP::PIPELINING;
 
 use 5.006;
 use strict;
+use base 'Net::Server::Mail::ESMTP::Extension';
 use constant GROUP_COMMANDS => [qw(RSET MAIL SEND SOML SAML RCPT)];
 
-sub new
+sub init
 {
-    my($proto, $parent) = @_;
-    my $class  = ref $proto || $proto;
-    my $self   = {};
-    bless($self, $class);
+    my($self, $parent) = @_;
     $parent->{process_operation} = \&process_operation;
     return $self;
 }
@@ -46,29 +44,9 @@ sub process_operation
     return
 }
 
-sub verb
-{
-    return ();
-}
-
 sub keyword
 {
     return 'PIPELINING';
-}
-
-sub parameter
-{
-    return ();
-}
-
-sub option
-{
-    return ();
-}
-
-sub reply
-{
-    return ();
 }
 
 1;
