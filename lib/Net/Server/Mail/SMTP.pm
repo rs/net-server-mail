@@ -68,8 +68,21 @@ sub step_maildata_path
 
 sub get_protoname
 {   
-    my($self) = @_;
     return 'SMTP';
+}
+
+sub get_sender
+{
+    my($self) = @_;
+    my $sender = $self->step_reverse_path();
+    return($sender ? $sender : undef);
+}
+
+sub get_recipients
+{
+    my($self) = @_;
+    my $recipients = $self->step_forward_path();
+    return(ref $recipients ? @$recipients : undef)
 }
 
 sub helo

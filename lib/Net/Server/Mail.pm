@@ -16,6 +16,60 @@ $Net::Server::Mail::VERSION = '0.01';
 
 Net::Server::Mail - Class to easly create mail server
 
+=head1 SYNOPSIS
+
+    use Net::Server::Mail::SMTP;
+
+    my @local_domains = qw(exemple.com foobar.com);
+    my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+    
+    my $conn;
+    while($conn = $server->accept)
+    {
+        my $smtp = new Net::Server::Mail::SMTP socket => $conn;
+        $smtp->set_callback(RCPT => \&valide_recipient);
+        $smtp->set_callback(DATA => \&queue_message);
+        $smtp->process;
+    }
+
+    sub valide_recipient
+    {
+        my($session, $recipient) = @_;
+        
+        my $domain;
+        if($recipient =~ /@(.*)>\s*$/)
+        {
+            $domain = $1;
+        }
+
+        if(not defined $domain)
+        {
+            return(0, 513, 'Syntax error.');
+        }
+        elsif(grep $domain eq $_, @local_domains)
+        {
+            return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
+        }
+
+        return(1);
+    }
+
+    sub queue_message
+    {
+        my($session, $data) = @_;
+
+        my $sender = $session->get_sender();
+        my @recipients = $session->get_recipients();
+
+        return(0, 554, 'Error: no valid recipients')
+            unless(@recipients);
+        
+        my $msgid = add_queue($sender, \@recipients, $data);
+          or return(0);
+
+        return(1, 250, "message queued $msgid");
+    }
+
 =head1 DESCRIPTION
 
 This class is the base class for mail service protocols like
@@ -167,16 +221,16 @@ sub callback
 
     if(defined $self->{callback}->{$name})
     {
-        my $rv;
+        my @rv;
         eval
         {
-            $rv = &{$self->{callback}->{$name}}(@args);
+            @rv = &{$self->{callback}->{$name}}(@args);
         };
         if($@)
         {
             confess $@;
         }
-        return $rv;
+        return @rv;
     }
 
     return 1;
@@ -185,6 +239,8 @@ sub callback
 =pod
 
 =head2 set_callback
+
+($success, $code, $msg) = $obj->set_callback(VERB, \&function_reference)
 
     $mailserver->set_callback
     (
@@ -203,6 +259,8 @@ sub callback
     );
 
 Setup callback code to call on a particulare event.
+
+Your code have to return 1 to 3 values : (successnes, [return_code, ["message"]])
 
 =cut
 
