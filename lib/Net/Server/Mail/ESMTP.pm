@@ -167,6 +167,19 @@ sub sub_reply
     push(@{$self->{xreply}->{$verb}}, $code);
 }
 
+sub extend_mode
+{
+    my($self, $mode) = @_;
+    $self->{extend_mode} = $mode;
+    for my $extend (@{$self->{extensions}})
+    {
+        if($extend->can('extend_mode'))
+        {
+            $extend->extend_mode($mode);
+        }
+    }
+}
+
 =pod
 
 =head1 EVENTS
@@ -213,6 +226,7 @@ sub ehlo
         push(@extends, join(' ', $extend->keyword, $extend->parameter));
     }
 
+    $self->extend_mode(1);
     $self->make_event
     (
         name => 'EHLO',
@@ -221,7 +235,6 @@ sub ehlo
         {
             # according to the RFC, EHLO ensures "that both the SMTP client
             # and the SMTP server are in the initial state"
-            $self->{extend_mode} = 1;
             $self->step_reverse_path(1);
             $self->step_forward_path(0);
             $self->step_maildata_path(0);

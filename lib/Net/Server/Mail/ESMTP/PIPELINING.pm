@@ -9,9 +9,35 @@ sub init
 {
     my($self, $parent) = @_;
     $self->{parent} = $parent;
-    $parent->{process_operation} = \&process_operation;
-    $parent->{data_handle_more_data} = 1;
     return $self;
+}
+
+sub extend_mode
+{
+    my($self, $mode) = @_;
+    if($mode)
+    {
+        $self->{old_process_operation} =
+            $self->{parent}->{process_operation};
+        $self->{parent}->{process_operation} =
+            \&process_operation;
+        $self->{old_handle_more} =
+            $self->{parent}->{data_handle_more_data};
+        $self->{parent}->{data_handle_more_data} = 1;
+    }
+    else
+    {
+        if(exists($self->{old_process_operation}))
+        {
+            $self->{parent}->{process_operation} =
+                $self->{old_process_operation};
+        }
+        if(exists($self->{old_handle_more}))
+        {
+            $self->{parent}->{data_handle_more_data} = 
+                $self->{old_handle_more};
+        }
+    }
 }
 
 sub process_operation
