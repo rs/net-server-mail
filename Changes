@@ -1,3 +1,14 @@
+2003-01-01  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.03
+
+	* Fix a bug in constructor with handle_in and handle_out
+
+	* Fix a bug in POD documentation (thanks to Martin H. Sluka)
+
+	* Fix a misunderstanding of the RFC, DATA command reinitialize the
+	connection state (thanks to Martin H. Sluka)
+
 2002-12-05  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.02
