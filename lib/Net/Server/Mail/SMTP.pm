@@ -17,10 +17,46 @@ sub init
     $self->set_cmd(RSET => \&rset);
     $self->set_cmd(QUIT => \&quit);
 
-    $self->set_callback(MAIL => \&mail_callback);
+    # go to the initial step
+    $self->step_reverse_path(0);
+    $self->step_forward_path(0);
+    $self->step_maildata_path(0);
 
     return $self;
 }
+
+sub step_reverse_path
+{
+    my($self, $bool) = @_;
+    if(defined $bool)
+    {
+        $self->{reverse_path} = $bool;
+    }   
+    
+    return $self->{reverse_path};
+}   
+
+sub step_forward_path
+{
+    my($self, $bool) = @_;
+    if(defined $bool)
+    {
+        $self->{forward_path} = $bool;
+    }   
+    
+    return $self->{forward_path};
+}   
+
+sub step_maildata_path
+{
+    my($self, $bool) = @_;
+    if(defined $bool)
+    {
+        $self->{maildata_path} = $bool;
+    }   
+    
+    return $self->{maildata_path};
+}   
 
 sub get_protoname
 {   
@@ -32,18 +68,36 @@ sub get_protoname
 sub helo
 {
     my($self, $hostname) = @_;
+    
     unless(defined $hostname && length $hostname)
     {
         $self->reply(501, 'Syntax: HELO hostname');
     }
-    $self->reply(250, $self->get_hostname);
+    
+    $self->make_event
+    (
+        name => 'HELO',
+        arguments => [$hostname],
+        on_success => sub
+        {
+            # conforming to RFC, HELO ensure "that both the SMTP client and the
+            # SMTP server are in the initial state"
+            $self->step_reverse_path(1);
+            $self->step_forward_path(0);
+            $self->step_maildata_path(0);
+        },
+        success_reply => [250, 'Ok'],
+    );
+
     return;
 }
 
 sub noop
 {
     my($self) = @_;
-    $self->reply(250, 'Ok');
+
+    $self->make_event(name => 'NOOP');
+
     return;
 }
 
@@ -59,13 +113,19 @@ sub mail
 {
     my($self, $from, $address, @options) = @_;
 
+    unless($self->step_reverse_path)
+    {
+        $self->reply(503, 'Error: need HELO command');
+        return;
+    }
+
     unless(defined $from && lc $from eq 'from:')
     {
         $self->reply(501, 'Syntax: MAIL FROM: <address>');
         return;
     }
 
-    if(length $self->get_sender)
+    if($self->step_forward_path)
     {
         $self->reply(503, 'Error: nested MAIL command');
         return;
@@ -76,28 +136,17 @@ sub mail
         return;
     }
 
-    my($success, $code, $msg) = $self->callback('MAIL', $address);
-
-    if(defined $success && $success)
-    {
-        $self->set_sender($address);
-    }
-
-    if(defined $code)
-    {
-        $self->reply($code, $msg);
-    }
-    else
-    {
-        if(defined $success)
+    $self->make_event
+    (
+        name => 'MAIL',
+        arguments => [$address],
+        on_success => sub
         {
-            $self->reply(250, 'Ok');
-        }
-        else
-        {
-            $self->reply(550, 'Failure');
-        }
-    }
+            $self->step_forward_path(1);
+        },
+        success_reply => [250, 'Ok'],
+        failure_reply => [550, 'Failure'],
+    );
 
     return;
 }
@@ -127,7 +176,7 @@ sub mail_options
 sub rcpt
 {
     my($self, $to, $address, @options) = @_;
-    unless(length $self->get_sender)
+    unless($self->step_forward_path)
     {
         $self->reply(503, 'Error: need MAIL command');
         return;
@@ -144,28 +193,17 @@ sub rcpt
         return;
     }
 
-    my($success, $code, $msg) = $self->callback('RCPT', $address);
-
-    if(defined $success && $success)
-    {
-        $self->push_recipient($address);
-    }
-
-    if(defined $code)
-    {
-        $self->reply($code, $msg);
-    }
-    else
-    {
-        if(defined $success)
+    $self->make_event
+    (
+        name => 'RCPT',
+        arguments => [$address],
+        on_success => sub
         {
-            $self->reply(250, 'Ok');
-        }
-        else
-        {
-            $self->reply(550, 'Failure');
-        }
-    }
+            $self->step_maildata_path(1);
+        },
+        success_reply => [250, 'Ok'],
+        failure_reply => [550, 'Failure'],
+    );
 
     return;
 }
@@ -187,7 +225,7 @@ sub data
 {
     my($self, @args) = @_;
 
-    unless($self->get_recipient)
+    unless($self->step_maildata_path)
     {
         $self->reply(503, 'Error: need RCPT command');
         return;
@@ -203,79 +241,63 @@ sub data
 
     my $in = $self->get_in;
 
+    my $data;
     while(<$in>)
     {
         last if(/^\.\n\r?$/);
         
         # RFC 821 compliance.
         s/^\.\./\./;
-        $self->put_data($_);
+        $data .= $_;
     }
 
-    return $self->data_finished;
+    return $self->data_finished($data);
 }
 
 sub data_finished
 {
-    my($self) = @_;
+    my($self, $data) = @_;
 
-    my $id = $self->queue;
-    $self->reply(250, "Ok queued as $id");
+    $self->make_event
+    (
+        name => 'DATA',
+        arguments => [$data],
+        success_reply => [250, 'Ok'],
+    );
+
     return;
 }
 
 sub rset
 {
     my($self) = @_;
-    $self->reset_sender;
-    $self->reset_recipient;
-    $self->reset_data;
-    $self->reply(250, 'Ok');
+
+    $self->make_event
+    (
+        name => 'RSET',
+        on_success => sub
+        {
+            $self->step_reverse_path(0);
+            $self->step_forward_path(0);
+            $self->step_maildata_path(0);
+        },
+        success_reply => [250, 'Ok'],
+    );
+
     return;
 }
 
 sub quit
 {
     my($self) = @_;
-    $self->reply(221, 'Bye');
+    
+    $self->make_event
+    (
+        name => 'QUIT',
+        success_reply => [221, 'Bye'],
+    );
+
     return 1; # close cnx
 }
-
-# queue mechanism, should be in Net::Server::Mail::Queue
-
-sub queue
-{
-    my($self) = @_;
-    
-    my $id = $self->generate_id;
-    
-    my $msg =
-    {
-        sender      => $self->get_sender,
-        recipient   => [$self->get_recipient],
-        data        => $self->get_data,
-    };  
-    
-    $self->reset_sender;
-    $self->reset_recipient;
-    $self->reset_data;
-    
-    $self->{queue}->{$id} = $msg;
-    
-    return $id;
-}   
-
-sub get_queue
-{
-    my($self) = @_;
-    return $self->{queue};
-}   
-
-sub generate_id
-{
-    my($self) = @_;
-    return(join('', map(('A'..'Z', 0..9)[int(rand(36))], 0..9)))
-}   
-
 
 1;

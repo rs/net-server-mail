@@ -8,6 +8,52 @@ use Carp;
 
 $Net::Server::Mail::VERSION = '0.01';
 
+=pod
+
+=head1 NAME
+
+Net::Server::Mail - Class to easly create mail server
+
+=head1 DESCRIPTION
+
+This class is the base class for mail service protocols like
+SMTP, ESMTP and LMTP. Look at manual page for each of these
+sub-modules.
+
+=head1 METHODS
+
+=head2 new
+
+    $instance = new Net::Server::Mail [option => 'value', ...]
+
+options:
+
+=over 4
+
+=item handle_in and handle_out
+
+Tell on which handle server read and write commands.
+(defaults are STDIN/STDOUT)
+
+=item socket
+
+Instead of handle, read/write on a socket 
+
+=item error_sleep_time
+
+Number of seconds to wait for before print the error message,
+this can avoid some DoS attack by flooding server with bogus
+commands. A value of 0 unactivate this feature. (default is 0)
+
+=item idle_timeout
+
+Number of seconds of idle to wait before close connection. A value
+of 0 unactivate this feature. (default is 0)
+
+=back
+
+=cut
+
 sub new
 {
     my($proto, @args) = @_;
@@ -20,7 +66,7 @@ sub new
 sub init
 {
     my $self = shift;
-    croak "odd number of arguments" if(@_ % 2);
+    confess("odd number of arguments") if(@_ % 2);
     my $options = $self->{options} =
     {
         handle_in           => undef,
@@ -34,17 +80,128 @@ sub init
         $options->{lc($_[$i])} = $_[$i + 1];
     }
 
-    return unless
-    (
-        (defined $options->{handle_in} && defined $options->{handle_out})
-        || defined $options->{socket}
-    );
-
-    $self->reset_sender;
-    $self->reset_recipient;
-    $self->reset_data;
+    unless((defined $options->{handle_in} && defined $options->{handle_out})
+        or defined $options->{socket})
+    {
+        $options->{handle_in}  = \*STDIN;
+        $options->{handle_out} = \*STDOUT;
+    }
 
     return $self;
+}
+
+sub make_event
+{
+    my $self = shift;
+    confess('odd number of arguments') if(@_ % 2);
+    my %args = @_;
+
+    my $name = $args{'name'} || confess('missing argument: \'name\'');
+    my $args = defined $args{'arguments'} && ref $args{'arguments'} eq 'ARRAY'
+        ? $args{'arguments'} : [];
+    
+    my($success, $code, $msg) = $self->callback($name, @{$args});
+
+    if(defined $success && defined $args{'on_success'})
+    {
+        if(ref $args{'on_success'} eq 'CODE')
+        {
+            &{$args{'on_success'}};
+        }
+    }
+
+    if(defined $code)
+    {
+        $self->reply($code, $msg);
+    }
+    else
+    {
+        if(defined $success && $success)
+        {
+            if(defined $args{'success_reply'} && ref $args{'success_reply'} eq 'ARRAY')
+            {
+                # don't reply anything if code is an empty string
+                if(length $args{'success_reply'}->[0])
+                {
+                    $self->reply(@{$args{'success_reply'}});
+                }
+            }
+            else
+            {
+                $self->reply(250, 'Ok');
+            }
+        }
+        else
+        {
+            if(defined $args{'failure_reply'} && ref $args{'failure_reply'} eq 'ARRAY')
+            {
+                # don't reply anything if code is an empty string
+                if(length $args{'failure_reply'}->[0])
+                {
+                    $self->reply(@{$args{'failure_reply'}});
+                }
+            }
+            else
+            {
+                $self->reply(550, 'Failure');
+            }
+        }
+    }
+
+    return;
+}
+
+sub callback
+{
+    my($self, $name, @args) = @_;
+
+    if(defined $self->{callback}->{$name})
+    {
+        my $rv;
+        eval
+        {
+            $rv = &{$self->{callback}->{$name}}(@args);
+        };
+        if($@)
+        {
+            confess $@;
+        }
+        return $rv;
+    }
+
+    return 1;
+}
+
+=pod
+
+=head2 set_callback
+
+    $mailserver->set_callback
+    (
+        'RCPT', sub
+        {
+            my($address) = @_;
+            if(is_relayed($address))
+            {
+                return 1;
+            }
+            else
+            {
+                return(0, 513, 'Relaying denied.');
+            }
+        }
+    );
+
+Setup callback code to call on a particulare event.
+
+=cut
+
+sub set_callback
+{
+    my($self, $name, $code) = @_;
+    confess('bad callback() invocation')
+        unless defined $code && ref $code eq 'CODE';
+    $self->{callback}->{$name} = $code;
 }
 
 sub set_cmd
@@ -59,6 +216,16 @@ sub del_cmd
     delete $self->{cmd}->{$cmd}
         if defined $self->{cmd};
 }
+
+=pod
+
+=head2 process
+
+    $mailserver->process;
+
+Begin a new session
+
+=cut
 
 sub process
 {
@@ -101,12 +268,16 @@ sub reply
     sleep $self->{options}->{error_sleep_time}
         if($code >= 400 && $self->{options}->{error_sleep_time});
 
+    # default message
     $msg = $code >= 400 ? 'Failure' : 'Ok'
         unless defined $msg;
 
+    # handle multiple lines
     my @lines = split(/\n\r?/, $msg);
     for(my $i = 0; $i < @lines; $i++)
     {
+        # RFC say that all lines but the last have to
+        # split the code and the message with a dash (-)
         my $sep = $i == $#lines ? ' ' : '-';
         print $out "$code$sep$lines[$i]\n\r";
     }
@@ -164,65 +335,12 @@ sub get_appname
     return 'Net::Server::Mail (Perl)';
 }
 
-sub get_sender
-{
-    my($self) = @_;
-    return $self->{sender};
-}
-
-sub set_sender
-{
-    my($self, $sender) = @_;
-    $self->{sender} = $sender;
-}
-
-sub reset_sender
-{
-    my($self, $sender) = @_;
-    $self->{sender} = '';
-}
-
-sub get_recipient
-{
-    my($self) = @_;
-    return @{$self->{recipient}};
-}
-
-sub push_recipient
-{
-    my($self, @rcpt) = @_;
-    push @{$self->{recipient}}, @rcpt;
-}
-
-sub reset_recipient
-{
-    my($self) = @_;
-    $self->{recipient} = [];
-}
-
-sub get_data
-{
-    my($self) = @_;
-    return $self->{data};
-}
-
-sub put_data
-{
-    my($self, $data) = @_;
-    $self->{data} .= $data;
-}
-
-sub reset_data
-{
-    my($self, $date) = @_;
-    $self->{data} = '';
-}
-
 ###########################################################
 
 sub banner
 {
     my($self) = @_;
+    
     my $hostname  = $self->get_hostname  || '';
     my $protoname = $self->get_protoname || '';
     my $appname   = $self->get_appname   || '';
@@ -232,13 +350,24 @@ sub banner
     $str .= $protoname.' ' if length $protoname;
     $str .= $appname       if length $appname;
 
-    $self->reply(220, $str);
+    $self->make_event
+    (
+        name => 'banner',
+        success_reply => [220, $str],
+        failure_reply => ['',''],
+    );
 }
 
 sub timeout
 {
     my($self) = @_;
-    $self->reply(421, 'Error: timeout exceeded');
+
+    $self->make_event
+    (
+        name => 'timeout',
+        success_reply => [421, 'Error: timeout exceeded'],
+    );
+
     return 1;
 }
 
