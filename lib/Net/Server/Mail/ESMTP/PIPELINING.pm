@@ -8,7 +8,9 @@ use constant GROUP_COMMANDS => [qw(RSET MAIL SEND SOML SAML RCPT)];
 sub init
 {
     my($self, $parent) = @_;
+    $self->{parent} = $parent;
     $parent->{process_operation} = \&process_operation;
+    $parent->{data_handle_more_data} = 1;
     return $self;
 }
 
@@ -41,12 +43,6 @@ sub process_operation
         return $rv if defined $rv;
     }
     return
-}
-
-sub data_badsequence_error
-{
-    my($self) = @_;
-    $self->reply(550, "Protocol error: `DATA' not allowed in a group of commands");
 }
 
 sub keyword

@@ -106,6 +106,9 @@ sub init
     $self->step_forward_path(0);
     $self->step_maildata_path(0);
 
+    # handle data after the end of data indicator (.)
+    $self->{data_handle_more_data} = 0;
+
     return $self;
 }
 
@@ -574,19 +577,22 @@ sub data_part
     # search for end of data indicator
     if($data =~ /^\.\r?\n/m)
     {
-        if(length $')
+        my $more_data = $';
+        if(length $more_data)
         {
             # Client sent a command after the end of data indicator ".".
-            # Putting this error in a method to permit overriding
-            # (useful for the PIPELINING ESMTP extension)
-            $self->data_badsequence_error();
-            return;
+            if(!$self->{data_handle_more_data})
+            {
+                $self->reply(453, "Command received prior to completion of".
+                                  " previous command sequence");
+                return;
+            }
         }
         
         # RFC 821 compliance.
         ($data = $`) =~ s/^\.//mg;
         $self->{_data} .= $data;
-        return $self->data_finished();
+        return $self->data_finished($more_data);
     }
 
     # RFC 821 compliance.
@@ -607,16 +613,9 @@ sub data_part
     return;
 }
 
-sub data_badsequence_error
-{
-    my($self) = @_;
-    $self->reply(453, "Command received prior to completion of".
-                 " previous command sequence");
-}
-
 sub data_finished
 {
-    my($self) = @_;
+    my($self, $more_data) = @_;
 
     $self->make_event
     (
@@ -630,7 +629,15 @@ sub data_finished
     $self->step_forward_path(0);
     $self->step_maildata_path(0);
 
-    return;
+    # if more data, handle it
+    if($more_data)
+    {
+        return $self->{process_operation}($self, $more_data);
+    }
+    else
+    {
+        return;
+    }
 }
 
 =pod
