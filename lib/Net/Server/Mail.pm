@@ -255,6 +255,8 @@ sub make_event
         }
     }
 
+    die "recturn code `$code' isn't numeric" if($code =~ /\D/);
+
     $self->handle_reply($name, $success, $code, $msg)
       if defined $code and length $code;
 
@@ -305,7 +307,9 @@ sub callback
         my @rv;
         eval
         {
-            @rv = &{$self->{callback}->{$name}}(@args);
+            my($code, $context) = @{$self->{callback}->{$name}};
+            $self->set_context($context);
+            @rv = &{$code}($self, @args);
         };
         if($@)
         {
@@ -317,11 +321,23 @@ sub callback
     return 1;
 }
 
+sub set_context
+{
+    my($self, $context) = @_;
+    $self->{_context} = $context;
+}
+
+sub get_context
+{
+    my($self) = @_;
+    return $self->{_context};
+}
+
 =pod
 
 =head2 set_callback
 
-  ($success, $code, $msg) = $obj->set_callback(VERB, \&function)>
+  ($success, $code, $msg) = $obj->set_callback(VERB, \&function, $context)>
 
 Sets the callback code to be called on a particular event. The function should
 return 1 to 3 values: (success, [return_code, ["message"]]).
@@ -347,10 +363,10 @@ return 1 to 3 values: (success, [return_code, ["message"]]).
 
 sub set_callback
 {
-    my($self, $name, $code) = @_;
+    my($self, $name, $code, $context) = @_;
     confess('bad callback() invocation')
         unless defined $code && ref $code eq 'CODE';
-    $self->{callback}->{$name} = $code;
+    $self->{callback}->{$name} = [$code, $context];
 }
 
 sub def_verb
