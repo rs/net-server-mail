@@ -7,7 +7,10 @@
 	investigation and his patch.
 
 	* Fix an RFC misunderstanding about the RSET command. Server no
-	longer expect to HELO again after an RSET. Thanks to Gerhard
+	longer expect to HELO again after an RSET. Thanks again and again
+	to Gerhard Zeiler.
+
+	* Change the double dot handling in DATA. Thanks to Gerhard
 	Zeiler for his patch.
 
 
