@@ -36,3 +36,5 @@ sub reply
 {
     return ();
 }
+
+1;

@@ -32,7 +32,7 @@ if(!$pid)
     }
 }
 
-my $lmtp = new Net::LMTP 'localhost', $server_port, Debug => 1;
+my $lmtp = new Net::LMTP 'localhost', $server_port, Debug => 0;
 ok(defined $lmtp);
 
 ok($lmtp->mail("test\@bla.com"));

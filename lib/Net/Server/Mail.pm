@@ -261,7 +261,16 @@ sub process
         
         if(exists $self->{verb}->{uc $verb})
         {
-            my $rv = &{$self->{verb}->{uc $verb}}($self, $params);
+            my $action = $self->{verb}->{uc $verb};
+            my $rv;
+            if(ref $action eq 'CODE')
+            {
+                $rv = &{$self->{verb}->{uc $verb}}($self, $params);
+            }
+            else
+            {
+                $rv = $self->$action($params);
+            }
             # close connection if command return something
             return $rv if(defined $rv);
         }

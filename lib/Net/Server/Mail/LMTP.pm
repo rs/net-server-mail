@@ -13,7 +13,7 @@ sub init
     $self->undef_verb('HELO');
     $self->undef_verb('EHLO');
 
-    $self->def_verb(LHLO => \&lhlo);
+    $self->def_verb(LHLO => 'lhlo');
 
     return $self;
 }

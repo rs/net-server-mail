@@ -16,3 +16,10 @@ sub option
         ['MAIL', BODY => \&option_mail_body],
     );
 }
+
+sub option_mail_body
+{
+    return;
+}
+
+1;

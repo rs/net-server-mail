@@ -10,20 +10,20 @@ sub init
     my $rv = $self->SUPER::init(@args);
     return $rv unless $rv eq $self;
 
-    $self->def_verb(HELO => \&helo);
-    $self->def_verb(VEFY => \&vrfy);
-    $self->def_verb(EXPN => \&expn);
-    $self->def_verb(TURN => \&turn);
-    $self->def_verb(HELP => \&help);
-    $self->def_verb(NOOP => \&noop);
-    $self->def_verb(MAIL => \&mail);
-    $self->def_verb(RCPT => \&rcpt);
-    $self->def_verb(SEND => \&send);
-    $self->def_verb(SOML => \&soml);
-    $self->def_verb(SAML => \&saml);
-    $self->def_verb(DATA => \&data);
-    $self->def_verb(RSET => \&rset);
-    $self->def_verb(QUIT => \&quit);
+    $self->def_verb(HELO => 'helo');
+    $self->def_verb(VEFY => 'vrfy');
+    $self->def_verb(EXPN => 'expn');
+    $self->def_verb(TURN => 'turn');
+    $self->def_verb(HELP => 'help');
+    $self->def_verb(NOOP => 'noop');
+    $self->def_verb(MAIL => 'mail');
+    $self->def_verb(RCPT => 'rcpt');
+    $self->def_verb(SEND => 'send');
+    $self->def_verb(SOML => 'soml');
+    $self->def_verb(SAML => 'saml');
+    $self->def_verb(DATA => 'data');
+    $self->def_verb(RSET => 'rset');
+    $self->def_verb(QUIT => 'quit');
 
     # go to the initial step
     $self->step_reverse_path(0);
