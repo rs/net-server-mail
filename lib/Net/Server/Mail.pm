@@ -383,6 +383,7 @@ sub next_input_to
 
 sub tell_next_input_method
 {
+
     my($self, $input) = @_;
     # calling the method and reinitialize. Note: we have to reinit
     # before calling the code, because code can resetup this variable.
@@ -437,7 +438,7 @@ sub process
 sub process_once
 {
     my($self, $operation) = @_;
-    if($self->direct_input_to())
+    if($self->next_input_to())
     {
         return $self->tell_next_input_method($operation);
     }
