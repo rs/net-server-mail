@@ -570,8 +570,12 @@ sub data_part
 {
     my($self, $data) = @_;
 
-    return $self->data_finished()
-      if($data =~ /^\.\r?\n$/m);
+    if($data =~ if($data =~ /\A(.*)^\.\r?\n^(.*)\z/ms)
+    {
+        $self->{_data} .= $1;
+        $self->data_finished();
+        return $self->process_once($2);
+    }
 
     $self->make_event
       (
