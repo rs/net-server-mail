@@ -13,7 +13,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocole
 
 =head1 SYNOPSIS
 
-    use Net::Server::Mail::ESMTP;
+    use Net::Server::Mail::LMTP;
 
     my @local_domains = qw(example.com example.org);
     my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
@@ -21,10 +21,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocole
     my $conn;
     while($conn = $server->accept)
     {
-        my $esmtp = new Net::Server::Mail::SMTP socket => $conn;
-        # activate some extensions
-        $esmtp->register('Net::Server::Mail::ESMTP::8BITMIME');
-        $esmtp->register('Net::Server::Mail::ESMTP::PIPELINING');
+        my $esmtp = new Net::Server::Mail::LMTP socket => $conn;
         # adding some handlers
         $esmtp->set_callback(RCPT => \&validate_recipient);
         $esmtp->set_callback(DATA => \&queue_message);
@@ -88,6 +85,9 @@ sub init
     $self->undef_verb('EHLO');
 
     $self->def_verb(LHLO => 'lhlo');
+
+    # Required by RFC
+    $self->register('Net::Server::Mail::ESMTP::PIPELINING');
 
     return $self;
 }
