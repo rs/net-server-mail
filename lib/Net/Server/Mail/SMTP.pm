@@ -6,6 +6,10 @@ use base 'Net::Server::Mail';
 
 =pod
 
+=head1 NAME
+
+Net::Server::Mail::SMTP - A module to implement the SMTP protocole
+
 =head1 SYNOPSIS
 
     use Net::Server::Mail::SMTP;

@@ -6,6 +6,11 @@ use base qw(Net::Server::Mail::ESMTP);
 
 =pod
 
+=head1 NAME
+
+Net::Server::Mail::LMTP - A module to implement the LMTP protocole
+  
+
 =head1 SYNOPSIS
 
     use Net::Server::Mail::ESMTP;
