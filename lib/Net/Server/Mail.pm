@@ -312,6 +312,8 @@ sub process
     $self->banner;
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
+        # switching to non-blocking socket to handle PIPELINING
+        # ESMTP extension. See RFC 2920 for more details.
         $in->blocking(0);
         $_ = join '', <$in>;
         $in->blocking(1);
@@ -359,7 +361,7 @@ sub process_command
 sub tokenize_command
 {
     my($self, $line) = @_;
-    chomp($line);
+    $line =~ s/\r?\n$//s;
     $line =~ s/^\s+|\s+$//g;
     my($verb, $params) = split ' ', $line, 2;
     return(uc($verb), $params);
