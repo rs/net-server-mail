@@ -465,6 +465,9 @@ sub process
     $in->blocking(0);
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
+        # do not go into an infinit loop if client close the connection
+        last unless $_;
+
         $_ = join '', <$in>;
         if(defined $self->next_input_to())
         {
