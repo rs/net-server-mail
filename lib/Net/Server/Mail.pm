@@ -98,6 +98,8 @@ sub init
         $self->{out} = \*STDOUT;
     }
 
+    $self->{process_operation} = \&process_operation;
+
     return $self;
 }
 
@@ -248,40 +250,61 @@ sub process
     my $in  = $self->{in};
     my $sel = new IO::Select;
     $sel->add($in);
-    
+
     $self->banner;
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
-        $_ = <$in>;
+        $in->blocking(0);
+        $_ = join '', <$in>;
+        $in->blocking(1);
         next unless defined;
-        chomp;
-        s/^\s+|\s+$//g;
-        next unless length;
-        my($verb, $params) = split(' ', $_, 2);
-        
-        if(exists $self->{verb}->{uc $verb})
-        {
-            my $action = $self->{verb}->{uc $verb};
-            my $rv;
-            if(ref $action eq 'CODE')
-            {
-                $rv = &{$self->{verb}->{uc $verb}}($self, $params);
-            }
-            else
-            {
-                $rv = $self->$action($params);
-            }
-            # close connection if command return something
-            return $rv if(defined $rv);
-        }
-        else
-        {
-            $self->reply(500, 'Syntax error, command unrecognized');
-            next;
-        }
+        my $rv = $self->{process_operation}($self, $_);
+        # if $rv is defined, we have to close the connection
+        return $rv if defined $rv;
     }
 
     $self->timeout;
+}
+
+sub process_operation
+{
+    my($self, $operation) = @_;
+    my($verb, $params) = $self->tokenize_command($operation);
+    $self->process_command($verb, $params);
+}
+
+sub process_command
+{
+    my($self, $verb, $params) = @_;
+
+    if(exists $self->{verb}->{$verb})
+    {
+        my $action = $self->{verb}->{$verb};
+        my $rv;
+        if(ref $action eq 'CODE')
+        {
+            $rv = &{$self->{verb}->{$verb}}($self, $params);
+        }
+        else
+        {
+            $rv = $self->$action($params);
+        }
+        return $rv;
+    }
+    else
+    {
+        $self->reply(500, 'Syntax error, command unrecognized');
+        return;
+    }
+}
+
+sub tokenize_command
+{
+    my($self, $line) = @_;
+    chomp($line);
+    $line =~ s/^\s+|\s+$//g;
+    my($verb, $params) = split ' ', $line, 2;
+    return(uc($verb), $params);
 }
 
 sub reply

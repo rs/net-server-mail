@@ -262,7 +262,7 @@ sub data
         $self->reply(503, 'Bad sequence of commands');
         return;
     }
-    
+
     if(defined $args && length $args)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');

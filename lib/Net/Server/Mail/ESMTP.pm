@@ -41,7 +41,7 @@ sub register
             unless($class->can($method));
     }
 
-    my $extend = new $class or return;
+    my $extend = new $class $self or return;
     foreach my $verb_def ($extend->verb)
     {
         $self->def_verb(@$verb_def) or return;
@@ -86,6 +86,7 @@ sub ehlo
     unless(defined $hostname && length $hostname)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');
+        return;
     }
 
     my $response = $self->get_hostname . ' Service ready';

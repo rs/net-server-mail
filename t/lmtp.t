@@ -1,9 +1,16 @@
 use strict;
 use Test;
 use IO::Socket;
-use Net::LMTP;
+eval('use Net::LMTP');
 
-BEGIN {plan tests => 11;}
+if($@)
+{
+    print STDERR "\n*** You don't seem to have Net::LMTP instaled on your system\n";
+    plan tests => 0;
+    exit
+}
+
+plan tests => 11;
 
 use Net::Server::Mail::LMTP;
 ok(1);
