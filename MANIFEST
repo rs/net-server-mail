@@ -1,5 +1,8 @@
 Changes
-Mail.pm
+lib/Net/Server/Mail.pm
+lib/Net/Server/Mail/SMTP.pm
+lib/Net/Server/Mail/ESMTP.pm
+lib/Net/Server/Mail/LMTP.pm
 Makefile.PL
 MANIFEST
 README

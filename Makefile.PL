@@ -8,7 +8,7 @@ WriteMakefile
     'PREREQ_PM'		=> {},
     ($] >= 5.005 ?
         (
-            ABSTRACT_FROM   => 'Mail.pm',
+            ABSTRACT_FROM   => 'lib/Net/Server/Mail.pm',
             AUTHOR          => 'Olivier Poitrey <rs@rhapsodyk.net>')
         : ()
     ),
