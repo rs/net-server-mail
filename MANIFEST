@@ -1,5 +1,8 @@
-MANIFEST
+README
 Changes
+Makefile.PL
+eg/smtp-gateway.pl
+eg/smtpd-select.pl
 lib/Net/Server/Mail/ESMTP/8BITMIME.pm
 lib/Net/Server/Mail/ESMTP/Extension.pm
 lib/Net/Server/Mail/ESMTP/PIPELINING.pm
@@ -7,11 +10,6 @@ lib/Net/Server/Mail/ESMTP.pm
 lib/Net/Server/Mail/LMTP.pm
 lib/Net/Server/Mail/SMTP.pm
 lib/Net/Server/Mail.pm
-eg/smtp-gateway.pl
-eg/smtpd-select.pl
-Makefile.PL
-README
 t/esmtp.t
 t/lmtp.t
 t/smtp.t
-Makefile
