@@ -49,6 +49,7 @@ install:
 	# Add here commands to install the package into debian/tmp.
 	#$(MAKE) install DESTDIR=`pwd`/debian/tmp
 	$(MAKE) install PREFIX=$(TMP)/usr
+	install -m 0444 eg/*.pl $(TMP)/usr/share/doc/$(PACKAGE)/examples
 
 
 # Build architecture-independent files here.
