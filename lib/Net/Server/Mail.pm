@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.09';
+$Net::Server::Mail::VERSION = '0.10';
 
 =pod
 
@@ -506,7 +506,6 @@ sub process
         }
         # if $rv is defined, we have to close the connection
         return $rv if defined $rv;
-
     }
 
     $self->timeout;
