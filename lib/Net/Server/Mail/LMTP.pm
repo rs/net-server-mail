@@ -92,6 +92,11 @@ sub init
     return $self;
 }
 
+sub get_protoname
+{
+    return 'LMTP';
+}
+
 =pod
 
 =head1 EVENTS
@@ -145,7 +150,7 @@ sub lhlo
 
 sub data_finished
 {
-    my($self, $data) = @_;
+    my($self) = @_;
     
     my $recipients = $self->step_forward_path();
 
@@ -154,7 +159,7 @@ sub data_finished
         $self->make_event
         (
             name => 'DATA',
-            arguments => [$data, $forward_path],
+            arguments => [\$self->{_data}],
             success_reply => [250, 'Ok'],
             failure_reply => [550, "$forward_path Failed"],
         );
