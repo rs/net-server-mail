@@ -6,3 +6,5 @@ lib/Net/Server/Mail/LMTP.pm
 Makefile.PL
 MANIFEST
 README
+t/smtp.t
+t/lmtp.t
