@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.10';
+$Net::Server::Mail::VERSION = '0.11';
 
 =pod
 
@@ -488,7 +488,14 @@ sub process
         }
         else
         {
-            $_ = join '', <$in>;
+            my @lines = <$in>;
+            @lines = grep(defined, @lines);
+
+            if(scalar @lines) {
+                $_ = join '', @lines;
+            } else {
+                $_ = undef;
+            }
         }
         
         # do not go into an infinit loop if client close the connection
