@@ -191,6 +191,7 @@ sub init
         $self->{out} = IO::Handle->new->fdopen(fileno(STDOUT), "w");
     }
 
+    $self->{out}->autoflush(1);
     $self->{process_operation} = \&process_operation;
 
     return $self;
@@ -287,7 +288,7 @@ sub make_event
         }
     }
 
-    die "recturn code `$code' isn't numeric" if($code =~ /\D/);
+    die "return code `$code' isn't numeric" if($code =~ /\D/);
 
     $self->handle_reply($name, $success, $code, $msg)
       if defined $code and length $code;

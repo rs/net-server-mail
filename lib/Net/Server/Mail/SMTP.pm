@@ -580,7 +580,10 @@ sub data_part
             $self->data_badsequence_error();
             return;
         }
-        $self->{_data} .= $1;
+        $data = $1
+        # RFC 821 compliance.
+        $data =~ s/^\.//mg;
+        $self->{_data} .= $data;
         return $self->data_finished();
     }
 
