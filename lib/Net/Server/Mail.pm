@@ -6,6 +6,8 @@ use Sys::Hostname;
 use IO::Select;
 use Carp;
 
+use constant HOSTNAME => hostname();
+
 $Net::Server::Mail::VERSION = '0.01';
 
 =pod
@@ -128,7 +130,7 @@ sub make_event
             }
             else
             {
-                $self->reply(250, 'Ok');
+                $self->reply(250);
             }
         }
         else
@@ -143,7 +145,7 @@ sub make_event
             }
             else
             {
-                $self->reply(550, 'Failure');
+                $self->reply(550);
             }
         }
     }
@@ -252,7 +254,7 @@ sub process
         }
         else
         {
-            $self->reply(502, 'Error: command not implemented');
+            $self->reply(500, 'Syntax error, command unrecognized');
             next;
         }
     }
@@ -320,7 +322,7 @@ sub get_out
 sub get_hostname
 {
     my($self) = @_;
-    return hostname;
+    return HOSTNAME;
 }
 
 sub get_protoname
@@ -348,7 +350,8 @@ sub banner
     my $str;
     $str  = $hostname.' '  if length $hostname;
     $str .= $protoname.' ' if length $protoname;
-    $str .= $appname       if length $appname;
+    $str .= $appname.' '   if length $appname;
+    $str .= 'Service ready';
 
     $self->make_event
     (
@@ -365,7 +368,12 @@ sub timeout
     $self->make_event
     (
         name => 'timeout',
-        success_reply => [421, 'Error: timeout exceeded'],
+        success_reply => 
+        [
+            421,
+            $self->get_hostname . 
+                ' Timeout exceeded, closing transmission channel'
+        ],
     );
 
     return 1;

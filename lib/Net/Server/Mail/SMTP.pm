@@ -10,6 +10,10 @@ sub init
     $self->SUPER::init(@args);
 
     $self->set_cmd(HELO => \&helo);
+    $self->set_cmd(EHLO => \&ehlo);
+    $self->set_cmd(VEFY => \&vrfy);
+    $self->set_cmd(EXPN => \&expn);
+    $self->set_cmd(HELP => \&help);
     $self->set_cmd(NOOP => \&noop);
     $self->set_cmd(MAIL => \&mail);
     $self->set_cmd(RCPT => \&rcpt);
@@ -64,7 +68,6 @@ sub get_protoname
     return 'SMTP';
 }
 
-
 sub helo
 {
     my($self, $hostname) = @_;
@@ -86,9 +89,16 @@ sub helo
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
-        success_reply => [250, 'Ok'],
+        success_reply => [250, 'Requested mail action okay, completed'],
     );
 
+    return;
+}
+
+sub ehlo
+{
+    my($self, $hostname) = @_;
+    $self->reply(502, 'Command not implemented');
     return;
 }
 
@@ -98,6 +108,27 @@ sub noop
 
     $self->make_event(name => 'NOOP');
 
+    return;
+}
+
+sub expn
+{
+    my($self, $address) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
+}
+
+sub vrfy
+{
+    my($self, $address) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
+}
+
+sub help
+{
+    my($self, $command) = @_;
+    $self->reply(502, 'Command not implemented');
     return;
 }
 
@@ -115,19 +146,19 @@ sub mail
 
     unless($self->step_reverse_path)
     {
-        $self->reply(503, 'Error: need HELO command');
+        $self->reply(503, 'Bad sequence of commands');
         return;
     }
 
     unless(defined $from && lc $from eq 'from:')
     {
-        $self->reply(501, 'Syntax: MAIL FROM: <address>');
+        $self->reply(501, 'Syntax error in parameters or arguments');
         return;
     }
 
     if($self->step_forward_path)
     {
-        $self->reply(503, 'Error: nested MAIL command');
+        $self->reply(503, 'Bad sequence of commands');
         return;
     }
 
@@ -144,7 +175,7 @@ sub mail
         {
             $self->step_forward_path(1);
         },
-        success_reply => [250, 'Ok'],
+        success_reply => [250, 'Requested mail action okay, completed'],
         failure_reply => [550, 'Failure'],
     );
 
@@ -178,13 +209,13 @@ sub rcpt
     my($self, $to, $address, @options) = @_;
     unless($self->step_forward_path)
     {
-        $self->reply(503, 'Error: need MAIL command');
+        $self->reply(503, 'Bad sequence of commands');
         return;
     }
     
     unless(defined $to && lc $to eq 'to:')
     {
-        $self->reply(501, 'Syntax: RCPT TO: <address>');
+        $self->reply(501, 'Syntax error in parameters or arguments');
         return;
     }
 
@@ -201,7 +232,7 @@ sub rcpt
         {
             $self->step_maildata_path(1);
         },
-        success_reply => [250, 'Ok'],
+        success_reply => [250, 'Requested mail action okay, completed'],
         failure_reply => [550, 'Failure'],
     );
 
@@ -227,17 +258,17 @@ sub data
 
     unless($self->step_maildata_path)
     {
-        $self->reply(503, 'Error: need RCPT command');
+        $self->reply(503, 'Bad sequence of commands');
         return;
     }
     
     if(@args)
     {
-        $self->reply(501, 'Syntax: DATA');
+        $self->reply(501, 'Syntax error in parameters or arguments');
         return;
     }
 
-    $self->reply(354, 'End data with <CR><LF>.<CR><LF>');
+    $self->reply(354, 'Start mail input; end with <CRLF>.<CRLF>');
 
     my $in = $self->get_in;
 
@@ -247,7 +278,7 @@ sub data
         last if(/^\.\n\r?$/);
         
         # RFC 821 compliance.
-        s/^\.\./\./;
+        s/^\.//;
         $data .= $_;
     }
 
@@ -262,7 +293,7 @@ sub data_finished
     (
         name => 'DATA',
         arguments => [$data],
-        success_reply => [250, 'Ok'],
+        success_reply => [250, 'Requested mail action okay, completed'],
     );
 
     return;
@@ -281,7 +312,7 @@ sub rset
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
-        success_reply => [250, 'Ok'],
+        success_reply => [250, 'Requested mail action okay, completed'],
     );
 
     return;
@@ -294,7 +325,7 @@ sub quit
     $self->make_event
     (
         name => 'QUIT',
-        success_reply => [221, 'Bye'],
+        success_reply => [221, $self->get_hostname . ' Service closing transmission channel'],
     );
 
     return 1; # close cnx
