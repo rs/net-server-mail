@@ -1,6 +1,16 @@
-Revision history for Perl extension Net::Server::Mail.
+2002-12-05  Olivier Poitrey  <rs@rhapsodyk.net>
 
-0.01  Thu Jun 20 12:12:12 2002
-	- original version; created by h2xs 1.21 with options
-		-n Net::Server::Mail -X
+	* Release 0.02
+
+	* Fix bug in LMTP, protocol name not set
+
+	* Fix bug in LMTP, data_finished() method used to use the old data
+	handling mechanism (thanks to Andy Turner)
+
+2002-06-20  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.01
+	
+	* Original version; created by h2xs 1.21 with options -n
+	Net::Server::Mail -X
 
