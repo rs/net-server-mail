@@ -652,7 +652,8 @@ sub rset
         name => 'RSET',
         on_success => sub
         {
-            $self->step_reverse_path(0);
+            $self->step_reverse_path(1)
+              if($self->step_reverse_path());
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
