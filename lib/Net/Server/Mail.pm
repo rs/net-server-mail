@@ -164,6 +164,26 @@ sub init
     return $self;
 }
 
+=pod
+
+=head2 dojob
+
+Some command need to do some job after the handler call. Handler may
+want to overide this comportement an avoid this job to be executed.
+
+By calling this method with a (defined) false value as argument,
+expected job isn't executed. Defaults to true.
+
+=cut
+
+sub init_dojob {shift->{_dojob} = 1;}
+sub dojob
+{
+    my($self, $bool) = @_;
+    $self->{_dojob} = $bool if(defined $bool);
+    return $self->{_dojob};
+}
+
 sub make_event
 {
     my $self = shift;
@@ -173,17 +193,54 @@ sub make_event
     my $name = $args{'name'} || confess('missing argument: \'name\'');
     my $args = defined $args{'arguments'} && ref $args{'arguments'} eq 'ARRAY'
         ? $args{'arguments'} : [];
-    
+
+    $self->init_dojob();
     my($success, $code, $msg) = $self->callback($name, @{$args});
 
-    if(defined $success && defined $args{'on_success'})
+    # we have to take a proper decision if successness is undefined
+    if(not defined $success)
     {
-        if(ref $args{'on_success'} eq 'CODE')
+        if(exists $args{'default_reply'})
         {
-            &{$args{'on_success'}};
+            if(ref $args{'default_reply'} eq 'ARRAY')
+            {
+                ($success, $code, $msg) = $args{'default_reply'};
+                $success = 0 unless defined $success;
+            }
+            else
+            {
+                $success = $args{'default_reply'};
+            }
+        }
+        else
+        {
+            $success = 1; # default
         }
     }
 
+    # command may have some job to do regarding to the result. handler
+    # can avoid it by calling dojob() method with a false value.
+    if($self->dojob())
+    {
+        if($success)
+        {
+            if(defined $args{'on_success'}
+               and ref $args{'on_success'} eq 'CODE')
+            {
+                &{$args{'on_success'}};
+            }
+        }
+        else
+        {
+            if(defined $args{'on_failure'}
+               and ref $args{'on_failure'} eq 'CODE')
+            {
+                &{$args{'on_failure'}};
+            }
+        }
+    }
+
+    # ensure that a reply is sent, all SMTP command need at most 1 reply.
     unless(defined $code)
     {
         if(defined $success && $success)
@@ -212,7 +269,7 @@ sub make_event
 
     $self->handle_reply($name, $success, $code, $msg);
 
-    return;
+    return $success;
 }
 
 sub handle_reply
@@ -259,6 +316,7 @@ return 1 to 3 values: (success, [return_code, ["message"]]).
             my($address) = @_;
             if(is_relayed($address))
             {
+                # default success code/message will be used
                 return 1;
             }
             else
@@ -387,7 +445,7 @@ sub reply
 
     # handle multiple lines
     my @lines;
-    
+
     if(ref $msg)
     {
         confess "bad argument" unless ref $msg eq 'ARRAY';
@@ -465,5 +523,62 @@ sub timeout
 
     return 1;
 }
+
+=pod
+
+=head1 SEE ALSO
+
+Please, see L<Net::Server::Mail::SMTP>, L<Net::Server::Mail::ESMTP>
+and L<Net::Server::Mail::LMTP>.
+
+=head1 AUTHOR
+
+Olivier Poitrey E<lt>rs@rhapsodyk.netE<gt>
+
+=head1 AVAILABILITY
+
+The official FTP location is:
+
+B<ftp://ftp.rhapsodyk.net/pub/devel/perl/Net-Server-Mail/>
+
+Also available on CPAN.
+
+anonymous CVS repository:
+
+CVS_RSH=ssh cvs -d anonymous@cvs.rhapsodyk.net:/devel co
+Net-Server-Mail
+
+(supply an empty string as password)
+
+CVS repository on the web:
+
+http://www.rhapsodyk.net/cgi-bin/cvsweb/Net-Server-Mail/
+
+=head1 BUGS
+
+Please send bug-reports to rs-bugs@rhapsodyk.net.
+
+=head1 LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 2.1 of the
+License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+=head1 COPYRIGHT
+
+Copyright (C) 2002 - Olivier Poitrey
+
+=cut
 
 1;
