@@ -72,10 +72,25 @@ Net::Server::Mail - Class to easily create a mail server
 
 =head1 DESCRIPTION
 
-This class is the base class for mail service protocols such as
+This module is a versatile and extensible implementation of the SMTP
+protocol and its different evolutions like ESMTP and LMTP. The event
+driven object-oriented API makes easy to incorporate the SMTP protocol
+to your programs.
+
+Other SMTPd implementations don't support useful ESMTP extensions and
+the LMTP protocol. Their interface design precludes adding them
+later. So I've decided to rewrite a complete implementation with
+extensibility in mind.
+
+It provides mechanism to easy addition future or not yet implemented
+ESMTP extensions. Developers can hook code at each SMTP session state
+and change the module's behaviors by registering event call-backs. The
+class is designed to be easily inherited from.
+
+This class is the base class for mail service protocols such axs
 B<Net::Server::Mail::SMTP>, B<Net::Server::Mail::ESMTP> and
-B<Net::Server::Mail::LMTP>. Refer to the documentation provided
-with each of these modules.
+B<Net::Server::Mail::LMTP>. Refer to the documentation provided with
+each of these modules.
 
 =head1 METHODS
 
