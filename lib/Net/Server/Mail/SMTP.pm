@@ -79,6 +79,7 @@ sub helo
     unless(defined $hostname && length $hostname)
     {
         $self->reply(501, 'Syntax error in parameters or arguments');
+        return;
     }
     
     $self->make_event
