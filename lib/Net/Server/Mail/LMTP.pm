@@ -94,7 +94,7 @@ sub init
 
 =pod
 
-=head1 CALLBACKS
+=head1 EVENTS
 
 Descriptions of callback who's can be used with set_callback
 method. All handle takes the Net::Server::Mail::ESMTP object as first

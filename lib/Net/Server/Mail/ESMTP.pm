@@ -7,6 +7,10 @@ use base qw(Net::Server::Mail::SMTP);
 
 =pod
 
+=head1 NAME
+
+Net::Server::Mail::ESMTP - A module to implement the ESMTP protocole
+
 =head1 SYNOPSIS
 
     use Net::Server::Mail::ESMTP;
@@ -164,7 +168,7 @@ sub sub_reply
 
 =pod
 
-=head1 CALLBACKS
+=head1 EVENTS
 
 Descriptions of callback who's can be used with set_callback
 method. All handle takes the Net::Server::Mail::ESMTP object as first

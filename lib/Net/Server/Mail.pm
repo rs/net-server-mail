@@ -548,6 +548,14 @@ sub get_appname
 Send the introduction banner. You have to call it manually when are
 using process_once() method. Don't use it with process() method.
 
+=head1 EVENTS
+
+=head2 banner
+
+Append at the opening of a new connection.
+
+Handler takes no argument.
+
 =cut
 
 sub banner
@@ -575,6 +583,16 @@ sub banner
         failure_reply => ['',''],
     );
 }
+
+=pod
+
+=head2 timeout
+
+This event append where timeout is exeded.
+
+Handler takes no argument.
+
+=cut
 
 sub timeout
 {
