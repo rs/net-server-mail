@@ -10,17 +10,20 @@ sub init
     my $rv = $self->SUPER::init(@args);
     return $rv unless $rv eq $self;
 
-    $self->set_cmd(HELO => \&helo);
-    $self->set_cmd(EHLO => \&ehlo);
-    $self->set_cmd(VEFY => \&vrfy);
-    $self->set_cmd(EXPN => \&expn);
-    $self->set_cmd(HELP => \&help);
-    $self->set_cmd(NOOP => \&noop);
-    $self->set_cmd(MAIL => \&mail);
-    $self->set_cmd(RCPT => \&rcpt);
-    $self->set_cmd(DATA => \&data);
-    $self->set_cmd(RSET => \&rset);
-    $self->set_cmd(QUIT => \&quit);
+    $self->def_verb(HELO => \&helo);
+    $self->def_verb(VEFY => \&vrfy);
+    $self->def_verb(EXPN => \&expn);
+    $self->def_verb(TURN => \&turn);
+    $self->def_verb(HELP => \&help);
+    $self->def_verb(NOOP => \&noop);
+    $self->def_verb(MAIL => \&mail);
+    $self->def_verb(RCPT => \&rcpt);
+    $self->def_verb(SEND => \&send);
+    $self->def_verb(SOML => \&soml);
+    $self->def_verb(SAML => \&saml);
+    $self->def_verb(DATA => \&data);
+    $self->def_verb(RSET => \&rset);
+    $self->def_verb(QUIT => \&quit);
 
     # go to the initial step
     $self->step_reverse_path(0);
@@ -75,7 +78,7 @@ sub helo
     
     unless(defined $hostname && length $hostname)
     {
-        $self->reply(501, 'Syntax: HELO hostname');
+        $self->reply(501, 'Syntax error in parameters or arguments');
     }
     
     $self->make_event
@@ -96,23 +99,24 @@ sub helo
     return;
 }
 
-sub ehlo
-{
-    helo(@_);
-}
-
 sub noop
 {
     my($self) = @_;
-
     $self->make_event(name => 'NOOP');
-
     return;
 }
 
 sub expn
 {
     my($self, $address) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
+}
+
+sub turn
+{
+    # deprecated in RFC 2821
+    my($self) = @_;
     $self->reply(502, 'Command not implemented');
     return;
 }
@@ -164,7 +168,7 @@ sub mail
 
     my($address, @options) = split(' ', $args);
 
-    unless($self->mail_options(@options))
+    unless($self->handle_options('MAIL', $address, @options))
     {
         return;
     }
@@ -178,34 +182,12 @@ sub mail
             $self->step_reverse_path($address);
             $self->step_forward_path(1);
         },
-        success_reply => [250, 'Requested mail action okay, completed'],
+        success_reply => [250, "sender $address OK"],
         failure_reply => [550, 'Failure'],
     );
 
     return;
 }
-
-sub mail_options
-{
-    my($self, @options) = @_;
-
-    if(@options)
-    {
-        $self->reply(555, "Unsupported option: $options[0]");
-        return 0;
-    }
-
-    return 1;
-}
-
-=pod
-
-=head2 Callback RCPT
-
-    ($success, [$code, [$msg]]) = callback($address);
-
-=cut
-
 
 sub rcpt
 {
@@ -225,7 +207,7 @@ sub rcpt
 
     my($address, @options) = split(' ', $args);
 
-    unless($self->mail_options(@options))
+    unless($self->handle_options('RCPT', $address, @options))
     {
         return;
     }
@@ -242,24 +224,32 @@ sub rcpt
             $self->step_forward_path($buffer);
             $self->step_maildata_path(1);
         },
-        success_reply => [250, 'Requested mail action okay, completed'],
+        success_reply => [250, "recipient $address OK"],
         failure_reply => [550, 'Failure'],
     );
 
     return;
 }
 
-sub rcpt_options
+sub send
 {
-    my($self, @options) = @_;
+    my($self) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
+}
 
-    if(@options)
-    {
-        $self->reply(555, "Unsupported option: $options[0]");
-        return 0;
-    }
+sub soml
+{
+    my($self) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
+}
 
-    return 1;
+sub saml
+{
+    my($self) = @_;
+    $self->reply(502, 'Command not implemented');
+    return;
 }
 
 sub data
@@ -303,7 +293,7 @@ sub data_finished
     (
         name => 'DATA',
         arguments => [$data],
-        success_reply => [250, 'Requested mail action okay, completed'],
+        success_reply => [250, 'message sent'],
     );
 
     return;
@@ -339,6 +329,22 @@ sub quit
     );
 
     return 1; # close cnx
+}
+
+##########################################################################
+
+sub handle_options
+{
+    # handle options for verb MAIL and RCPT
+    my($self, $verb, $address, @options) = @_;
+
+    if(@options)
+    {
+        $self->reply(555, "Unsupported option: $options[0]");
+        return 0;
+    }
+
+    return 1;
 }
 
 1;

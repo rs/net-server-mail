@@ -121,45 +121,42 @@ sub make_event
         }
     }
 
-    if(defined $code)
-    {
-        $self->reply($code, $msg);
-    }
-    else
+    unless(defined $code)
     {
         if(defined $success && $success)
         {
             if(defined $args{'success_reply'} && ref $args{'success_reply'} eq 'ARRAY')
             {
-                # don't reply anything if code is an empty string
-                if(length $args{'success_reply'}->[0])
-                {
-                    $self->reply(@{$args{'success_reply'}});
-                }
+                ($code, $msg) = @{$args{'success_reply'}};
             }
             else
             {
-                $self->reply(250);
+                $code = 250;
             }
         }
         else
         {
             if(defined $args{'failure_reply'} && ref $args{'failure_reply'} eq 'ARRAY')
             {
-                # don't reply anything if code is an empty string
-                if(length $args{'failure_reply'}->[0])
-                {
-                    $self->reply(@{$args{'failure_reply'}});
-                }
+                ($code, $msg) = @{$args{'failure_reply'}};
             }
             else
             {
-                $self->reply(550);
+                $code = 550;
             }
         }
     }
 
+    $self->handle_reply($name, $success, $code, $msg);
+
     return;
+}
+
+sub handle_reply
+{
+    my($self, $verb, $success, $code, $msg) = @_;
+    # don't reply anything if code is empty
+    $self->reply($code, $msg) if(length $code);
 }
 
 sub callback
@@ -215,17 +212,23 @@ sub set_callback
     $self->{callback}->{$name} = $code;
 }
 
-sub set_cmd
+sub def_verb
 {
-    my($self, $cmd, $coderef) = @_;
-    $self->{cmd}->{uc $cmd} = $coderef;
+    my($self, $verb, $coderef) = @_;
+    $self->{verb}->{uc $verb} = $coderef;
 }
 
-sub del_cmd
+sub undef_verb
 {
-    my($self, $cmd) = @_;
-    delete $self->{cmd}->{$cmd}
-        if defined $self->{cmd};
+    my($self, $verb) = @_;
+    delete $self->{verb}->{$verb}
+        if defined $self->{verb};
+}
+
+sub list_verb
+{
+    my($self) = @_;
+    return keys %{$self->{verb}};
 }
 
 =pod
@@ -254,11 +257,11 @@ sub process
         chomp;
         s/^\s+|\s+$//g;
         next unless length;
-        my($cmd, $args) = split(' ', $_, 2);
+        my($verb, $params) = split(' ', $_, 2);
         
-        if(exists $self->{cmd}->{uc $cmd})
+        if(exists $self->{verb}->{uc $verb})
         {
-            my $rv = &{$self->{cmd}->{uc $cmd}}($self, $args);
+            my $rv = &{$self->{verb}->{uc $verb}}($self, $params);
             # close connection if command return something
             return $rv if(defined $rv);
         }
@@ -285,7 +288,17 @@ sub reply
         unless defined $msg;
 
     # handle multiple lines
-    my @lines = split(/\r?\n/, $msg);
+    my @lines;
+    
+    if(ref $msg)
+    {
+        confess "bad argument" unless ref $msg eq 'ARRAY';
+        @lines = @$msg;
+    }
+    else
+    {
+        @lines = split(/\r?\n/, $msg);
+    }
     for(my $i = 0; $i < @lines; $i++)
     {
         # RFC say that all lines but the last have to

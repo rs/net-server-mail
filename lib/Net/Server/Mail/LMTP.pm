@@ -10,10 +10,10 @@ sub init
     my $rv = $self->SUPER::init(@args);
     return $rv unless $rv eq $self;
 
-    $self->del_cmd('HELO');
-    $self->del_cmd('EHLO');
+    $self->undef_verb('HELO');
+    $self->undef_verb('EHLO');
 
-    $self->set_cmd(LHLO => \&lhlo);
+    $self->def_verb(LHLO => \&lhlo);
 
     return $self;
 }
@@ -35,7 +35,7 @@ sub data_finished
         (
             name => 'DATA',
             arguments => [$data, $forward_path],
-            success_reply => [250, 'Requested mail action okay, completed'],
+            success_reply => [250, 'Ok'],
             failure_reply => [550, "$forward_path Failed"],
         );
     }
