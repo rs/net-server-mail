@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Server::Mail.
+
+0.01  Thu Jun 20 12:12:12 2002
+	- original version; created by h2xs 1.21 with options
+		-n Net::Server::Mail -X
+
