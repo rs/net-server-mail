@@ -1,3 +1,16 @@
+2003-04-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.8
+
+	* Platform specific patch applied for win32 to work around its
+	lack of support for nonbocking IO. Thanks to Scotty Allen for his
+	investigation and his patch.
+
+	* Fix an RFC misunderstanding about the RSET command. Server no
+	longer expect to HELO again after an RSET. Thanks to Gerhard
+	Zeiler for his patch.
+
+
 2003-03-14  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.7
