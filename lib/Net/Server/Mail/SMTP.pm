@@ -114,8 +114,8 @@ sub step_reverse_path
     if(defined $bool)
     {
         $self->{reverse_path} = $bool;
-    }   
-    
+    }
+
     return $self->{reverse_path};
 }
 
@@ -125,10 +125,10 @@ sub step_forward_path
     if(defined $bool)
     {
         $self->{forward_path} = $bool;
-    }   
-    
+    }
+
     return $self->{forward_path};
-}   
+}
 
 sub step_maildata_path
 {
@@ -136,13 +136,18 @@ sub step_maildata_path
     if(defined $bool)
     {
         $self->{maildata_path} = $bool;
-    }   
-    
+        # initialise data container
+        if(not $bool)
+        {
+            $self->{_data} = '';
+        }
+    }
+
     return $self->{maildata_path};
-}   
+}
 
 sub get_protoname
-{   
+{
     return 'SMTP';
 }
 
@@ -517,8 +522,20 @@ sub saml
 
 =head2 DATA
 
-Handler takes data as argument. You should queue the message and
-reply with the queue ID.
+This handler is called after the final . sent by client. It takes data
+as argument. You should queue the message and reply with the queue ID.
+
+=head2 DATA-INIT
+
+This handler is called before enter in the "waiting for data" step. The
+default success reply is a 354 code telling the client to send the
+mail content.
+
+=head2 DATA-PART
+
+This handler is called at each parts of mail content sent. It takes as
+argument a scalar reference to the part of data received. It is
+deprecated to change the contents of this scalar.
 
 =cut
 
@@ -538,31 +555,53 @@ sub data
         return;
     }
 
-    $self->reply(354, 'Start mail input; end with <CRLF>.<CRLF>');
+    $self->make_event
+      (
+       name => 'DATA-INIT',
+       on_success => sub {$self->next_input_to(\&data_part);},
+       success_reply => [354, 'Start mail input; end with <CRLF>.<CRLF>']
+      );
 
-    my $in = $self->{in};
-
-    my $data;
-    while($_=<$in>)
-    {
-        last if(/^\.\r?\n$/);
-
-        # RFC 821 compliance.
-        s/^\.//;
-        $data .= $_;
-    }
-
-    return $self->data_finished($data);
+    return;
 }
 
-sub data_finished
+sub data_part
 {
     my($self, $data) = @_;
 
     $self->make_event
+      (
+       name => 'DATA-PART',
+       arguments => [\$data],
+       on_success => sub
+       {
+           if($data =~ /^\.\r?\n$/m)
+           {
+               return $self->data_finished();
+           }
+           else
+           {
+               # RFC 821 compliance.
+               $data =~ s/^\.//mg;
+               $self->{_data} .= $data;
+               # please, recall me soon !
+               $self->next_input_to(\&data_part);
+           }
+       },
+       success_reply => '', # don't send any reply !
+      );
+
+    return;
+}
+
+sub data_finished
+{
+    my($self) = @_;
+
+    $self->make_event
     (
         name => 'DATA',
-        arguments => [$data],
+        arguments => [$self->{_data}],
         success_reply => [250, 'message sent'],
     );
 
