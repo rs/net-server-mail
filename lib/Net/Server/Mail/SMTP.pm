@@ -523,7 +523,8 @@ sub saml
 =head2 DATA
 
 This handler is called after the final . sent by client. It takes data
-as argument. You should queue the message and reply with the queue ID.
+as argument in a scalar reference. You should queue the message and
+reply with the queue ID.
 
 =head2 DATA-INIT
 
@@ -569,24 +570,20 @@ sub data_part
 {
     my($self, $data) = @_;
 
+    return $self->data_finished()
+      if($data =~ /^\.\r?\n$/m);
+
     $self->make_event
       (
        name => 'DATA-PART',
        arguments => [\$data],
        on_success => sub
        {
-           if($data =~ /^\.\r?\n$/m)
-           {
-               return $self->data_finished();
-           }
-           else
-           {
-               # RFC 821 compliance.
-               $data =~ s/^\.//mg;
-               $self->{_data} .= $data;
-               # please, recall me soon !
-               $self->next_input_to(\&data_part);
-           }
+           # RFC 821 compliance.
+           $data =~ s/^\.//mg;
+           $self->{_data} .= $data;
+           # please, recall me soon !
+           $self->next_input_to(\&data_part);
        },
        success_reply => '', # don't send any reply !
       );
@@ -601,7 +598,7 @@ sub data_finished
     $self->make_event
     (
         name => 'DATA',
-        arguments => [$self->{_data}],
+        arguments => [\$self->{_data}],
         success_reply => [250, 'message sent'],
     );
 
