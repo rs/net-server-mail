@@ -1,3 +1,10 @@
+2003-02-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.6
+
+	* Fix a major bug in data-part, at the end of data detection that prevent
+        further command to be procced
+
 2003-01-27  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.5
