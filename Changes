@@ -1,3 +1,10 @@
+2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.11
+
+	* Fix an infinit loop bug introduced in 0.09 release while
+          fixing the CPAN bug #9014
+
 2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.10
