@@ -412,13 +412,12 @@ sub process
     $sel->add($in);
 
     $self->banner;
+    # switch to non-blocking socket to handle PIPELINING
+    # ESMTP extension. See RFC 2920 for more details.
+    $in->blocking(0);
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
-        # switch to non-blocking socket to handle PIPELINING
-        # ESMTP extension. See RFC 2920 for more details.
-        $in->blocking(0);
         $_ = join '', <$in>;
-        $in->blocking(1);
         if(defined $self->next_input_to())
         {
             $self->tell_next_input_method($_);
@@ -542,24 +541,37 @@ sub get_appname
 
 ###########################################################
 
+=pod
+
+=head2 banner
+
+Send the introduction banner. You have to call it manually when are
+using process_once() method. Don't use it with process() method.
+
+=cut
+
 sub banner
 {
     my($self) = @_;
-    
-    my $hostname  = $self->get_hostname  || '';
-    my $protoname = $self->get_protoname || '';
-    my $appname   = $self->get_appname   || '';
-    
-    my $str;
-    $str  = $hostname.' '  if length $hostname;
-    $str .= $protoname.' ' if length $protoname;
-    $str .= $appname.' '   if length $appname;
-    $str .= 'Service ready';
+
+    unless(defined $self->{banner_string})
+    {
+        my $hostname  = $self->get_hostname  || '';
+        my $protoname = $self->get_protoname || '';
+        my $appname   = $self->get_appname   || '';
+
+        my $str;
+        $str  = $hostname.' '  if length $hostname;
+        $str .= $protoname.' ' if length $protoname;
+        $str .= $appname.' '   if length $appname;
+        $str .= 'Service ready';
+        $self->{banner_string} = $str;
+    }
 
     $self->make_event
     (
         name => 'banner',
-        success_reply => [220, $str],
+        success_reply => [220, $self->{banner_string}],
         failure_reply => ['',''],
     );
 }
