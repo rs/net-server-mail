@@ -6,6 +6,16 @@ protocol and its different evolutions like ESMTP and LMTP. The event
 driven object-oriented API makes easy to incorporate the SMTP protocol
 to your programs.
 
+Other SMTPd implementations don't support useful ESMTP extensions and
+the LMTP protocol. Their interface design precludes adding them
+later. So I've decided to rewrite a complete implementation with
+extensibility in mind.
+
+It provides mechanism to easy addition future or not yet implemented
+ESMTP extensions. Developers can hook code at each SMTP session state
+and change the module's behaviors by registering event call-backs. The
+class is designed to be easily inherited from.
+
 INSTALLATION
 
 To install this module type the following:
