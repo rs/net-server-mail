@@ -18,7 +18,6 @@ sub process_operation
     my @commands = grep(length $_, split(/\r?\n/, $operation));
     for(my $i = 0; $i <= $#commands; $i++)
     {
-        next unless length;
         my($verb, $params) = $self->tokenize_command($commands[$i]);
 
         # Once the client SMTP has confirmed that support exists for
