@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.07';
+$Net::Server::Mail::VERSION = '0.08';
 
 =pod
 
@@ -463,10 +463,32 @@ sub process
     $self->banner;
     # switch to non-blocking socket to handle PIPELINING
     # ESMTP extension. See RFC 2920 for more details.
-    $in->blocking(0);
+    if($^O eq 'MSWin32')
+    {
+        # win32 platforms don't support nonblocking IO
+        ioctl($in, 2147772030, 1);
+    }
+    else
+    {
+        defined($in->blocking(0)) or die "Couldn't set nonblocking: $^E";
+    }
+    
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
-        $_ = join '', <$in>;
+        if ($^O eq 'MSWin32')
+        {
+            # see how much data is available to read
+            my $size = pack("L",0);
+            ioctl($in, 1074030207, $size);
+            $size = unpack("L", $size);
+
+            # read the data and put it in the $_ variable
+            read($in, $_, $size);
+        }
+        else
+        {
+            $_ = join '', <$in>;
+        }
         
         # do not go into an infinit loop if client close the connection
         last unless $_;
