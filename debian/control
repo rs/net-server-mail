@@ -1,0 +1,15 @@
+Source: libnet-server-mail-perl
+Section: interpreters
+Priority: optional
+Build-Depends: debhelper (>= 3.0.5), perl (>= 5.6.0-17)
+Maintainer: Olivier Poitrey <rs@rhapsodyk.net>
+Standards-Version: 3.5.1
+
+Package: libnet-server-mail-perl
+Architecture: all
+Depends: ${perl:Depends}
+Description:  Class to easily create a mail server
+ This class is the base class for mail service protocols such as
+ Net::Server::Mail::SMTP, Net::Server::Mail::ESMTP and
+ Net::Server::Mail::LMTP. Refer to the documentation provided
+ with each of these modules.

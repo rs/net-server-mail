@@ -1,0 +1,9 @@
+libnet-server-mail-perl (0.01-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Olivier Poitrey <rs@rhapsodyk.net>  Sat,  9 Nov 2002 13:10:55 +0100
+
+Local variables:
+mode: debian-changelog
+End:
