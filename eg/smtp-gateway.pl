@@ -3,8 +3,7 @@
 # Olivier Poitrey <rs@rhapsodyk.net>
 # 8th november 2002
 # 
-# smtpd-select.pl: A dummy SMTP server using Net::Server::Mail and
-# IO::Select.
+# smtp-gateway.pl: A simple SMTP gateway example.
 
 require 5.006;
 use strict;
