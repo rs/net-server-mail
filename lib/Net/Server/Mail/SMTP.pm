@@ -570,7 +570,7 @@ sub data_part
 {
     my($self, $data) = @_;
 
-    if($data =~ if($data =~ /\A(.*)^\.\r?\n^(.*)\z/ms)
+    if($data =~ /\A(?:(.*))?^\.\r?\n(?:^(.*))?\z/ms)
     {
         if(defined $2 and length $2)
         {
