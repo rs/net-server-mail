@@ -161,7 +161,7 @@ sub init
 
     if(defined $options->{handle_in} && defined $options->{handle_out})
     {
-        if(ref $options->{handle_in} eq 'IO::Handle')
+        if(UNIVERSAL::isa($options->{handle_in},'IO::Handle'))
         {
             $self->{in} = $options->{handle_in};
         }
@@ -170,7 +170,7 @@ sub init
             $self->{in} = 
               IO::Handle->new->fdopen(fileno($options->{handle_in}), "r");
         }
-        if(ref $options->{handle_out} eq 'IO::Handle')
+        if(UNIVERSAL::isa($options->{handle_out},'IO::Handle'))
         {
             $self->{out} = $options->{handle_out};
         }
