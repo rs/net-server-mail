@@ -1,3 +1,9 @@
+libnet-server-mail-perl (0.07-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Olivier Poitrey <rs@rhapsodyk.net>  Mon,  17 Mar 2003 19:42:02 +0100
+
 libnet-server-mail-perl (0.06-1) unstable; urgency=low
 
   * New upstream
