@@ -43,6 +43,12 @@ sub process_operation
     return
 }
 
+sub data_badsequence_error
+{
+    my($self) = @_;
+    $self->reply(550, "Protocol error: `DATA' not allowed in a group of commands");
+}
+
 sub keyword
 {
     return 'PIPELINING';
