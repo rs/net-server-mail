@@ -5,8 +5,8 @@ eval('use Net::LMTP');
 
 if($@)
 {
-    print STDERR "\n*** You don't seem to have Net::LMTP installed on your system\n";
-    plan tests => 0;
+    plan tests => 1;
+    skip("You don't seem to have Net::LMTP installed on your system");
     exit
 }
 
