@@ -1,4 +1,10 @@
-2004-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.10
+
+	* Enable PIPELINING mode only in extended mode
+
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.9
 
