@@ -170,6 +170,13 @@ sub data_finished
         (
             name => 'DATA',
             arguments => [\$self->{_data}, $forward_path],
+            on_success => sub
+            {
+                # reinitiate the connection
+                $self->step_reverse_path(1);
+                $self->step_forward_path(0);
+                $self->step_maildata_path(0);
+            }, 
             success_reply => [250, 'Ok'],
             failure_reply => [550, "$forward_path Failed"],
         );
