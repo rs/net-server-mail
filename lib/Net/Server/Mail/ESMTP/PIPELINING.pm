@@ -17,7 +17,6 @@ sub new
 sub process_operation
 {
     my($self, $operation) = @_;
-    warn $operation."[end]";
     my @commands = grep(length $_, split(/\r?\n/, $operation));
     for(my $i = 0; $i <= $#commands; $i++)
     {
