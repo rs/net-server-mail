@@ -572,9 +572,16 @@ sub data_part
 
     if($data =~ if($data =~ /\A(.*)^\.\r?\n^(.*)\z/ms)
     {
+        if(defined $2 and length $2)
+        {
+            # Client sent a command after the end of data indicator ".".
+            # Putting this error in a method to permit overriding
+            # (useful for the PIPELINING ESMTP extension)
+            $self->data_badsequence_error();
+            return;
+        }
         $self->{_data} .= $1;
         $self->data_finished();
-        return $self->process_once($2);
     }
 
     $self->make_event
@@ -593,6 +600,13 @@ sub data_part
       );
 
     return;
+}
+
+sub data_badsequence_error
+{
+    my($self) = @_;
+    $self->reply(453, "Command received prior to completion of".
+                 " previous command sequence");
 }
 
 sub data_finished
