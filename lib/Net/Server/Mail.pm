@@ -250,6 +250,7 @@ sub process
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
         $_ = <$in>;
+        next unless defined;
         chomp;
         s/^\s+|\s+$//g;
         next unless length;
