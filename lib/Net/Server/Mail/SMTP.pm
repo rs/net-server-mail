@@ -7,7 +7,8 @@ use base 'Net::Server::Mail';
 sub init
 {
     my($self, @args) = @_;
-    $self->SUPER::init(@args);
+    my $rv = $self->SUPER::init(@args);
+    return $rv unless $rv eq $self;
 
     $self->set_cmd(HELO => \&helo);
     $self->set_cmd(EHLO => \&ehlo);
@@ -38,7 +39,7 @@ sub step_reverse_path
     }   
     
     return $self->{reverse_path};
-}   
+}
 
 sub step_forward_path
 {
@@ -174,6 +175,7 @@ sub mail
         arguments => [$address],
         on_success => sub
         {
+            $self->step_reverse_path($address);
             $self->step_forward_path(1);
         },
         success_reply => [250, 'Requested mail action okay, completed'],
@@ -234,6 +236,10 @@ sub rcpt
         arguments => [$address],
         on_success => sub
         {
+            my $buffer = $self->step_forward_path();
+            $buffer = [] unless ref $buffer eq 'ARRAY';
+            push(@$buffer, $address);
+            $self->step_forward_path($buffer);
             $self->step_maildata_path(1);
         },
         success_reply => [250, 'Requested mail action okay, completed'],
