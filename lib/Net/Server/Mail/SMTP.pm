@@ -411,7 +411,7 @@ sub mail
 
 Handler takes address as argument. On success, engage the mail data path step and
 push the given address into the recipient list for later use (get it
-with get_recipient() method).
+with get_recipients() method).
 
 =cut
 
