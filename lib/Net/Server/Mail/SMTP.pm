@@ -87,7 +87,7 @@ sub init
     return $rv unless $rv eq $self;
 
     $self->def_verb(HELO => 'helo');
-    $self->def_verb(VEFY => 'vrfy');
+    $self->def_verb(VRFY => 'vrfy');
     $self->def_verb(EXPN => 'expn');
     $self->def_verb(TURN => 'turn');
     $self->def_verb(HELP => 'help');
