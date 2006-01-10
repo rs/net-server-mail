@@ -218,7 +218,7 @@ sub ehlo
         return;
     }
 
-    my $response = $self->get_hostname . ' Service ready';
+    my $response = $self->get_hostname;
 
     my @extends;
     foreach my $extend ($self->get_extensions)
