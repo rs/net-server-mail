@@ -1,3 +1,10 @@
+2006-01-10  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.14
+
+	* Removed confusing "Service ready" substring from EHLO response
+          (reported by Stas Bekman)
+
 2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.11
