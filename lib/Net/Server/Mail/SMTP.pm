@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
+our $VERSION = "0.14"
+
 =pod
 
 =head1 NAME
@@ -560,6 +562,7 @@ sub data
         return;
     }
 
+    $self->{_last_chunk} = '';
     $self->make_event
       (
        name => 'DATA-INIT',
@@ -575,7 +578,7 @@ sub data_part
     my($self, $data) = @_;
 
     # search for end of data indicator
-    if($data =~ /^\.\r?\n/m)
+    if("$self->{last_chunk}$data" =~ /^\.\r*\n/m )
     {
         my $more_data = $';
         if(length $more_data)
@@ -590,13 +593,13 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        ($data = $`) =~ s/^\.//mg;
+        $data =~ s/^\.\r*\n$//m;
         $self->{_data} .= $data;
         return $self->data_finished($more_data);
     }
 
     # RFC 821 compliance.
-    $data =~ s/^\.//mg;
+    $data =~ s/^\.\r*\n$//m;
     $self->make_event
       (
        name => 'DATA-PART',
@@ -610,6 +613,7 @@ sub data_part
        success_reply => '', # don't send any reply !
       );
 
+    $self->{last_chunk} = '_'.substr $data, -5;
     return;
 }
 
