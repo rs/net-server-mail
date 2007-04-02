@@ -1,0 +1,96 @@
+2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.11
+
+	* Fix an infinit loop bug introduced in 0.09 release while
+          fixing the CPAN bug #9014
+
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.10
+
+	* Enable PIPELINING mode only in extended mode
+
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.9
+
+	* Fix CPAN bug #9014
+		
+2003-04-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.8
+
+	* Platform specific patch applied for win32 to work around its
+	lack of support for nonbocking IO. Thanks to Scotty Allen for his
+	investigation and his patch.
+
+	* Fix an RFC misunderstanding about the RSET command. Server no
+	longer expect to HELO again after an RSET. Thanks again and again
+	to Gerhard Zeiler.
+
+	* Change the double dot handling in DATA. Thanks to Gerhard
+	Zeiler for his patch.
+
+
+2003-03-14  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.7
+
+	* Fix a major bug in data-finished that prevent several recipients to be
+	proceed in the LMTP module
+
+	* Fix a minor bug in data-finished that prevent to reuse the session if the
+	DATA command was failed
+
+2003-02-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.6
+
+	* Fix a major bug in data-part, at the end of data detection that prevent
+        further command to be procced
+
+2003-01-27  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.5
+
+	* Fix a bug preventing compilation
+
+2003-01-25  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.4
+
+	* Fix a bug in constructor in handle class check
+
+	* Fix a dead loop in connection handling when client close the
+	connection before the end of transaction
+
+	* Fix a bug in DATA command that prevent to detect the end of data
+
+2003-01-01  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.03
+
+	* Fix a bug in constructor with handle_in and handle_out
+
+	* Fix a bug in POD documentation (thanks to Martin H. Sluka)
+
+	* Fix a misunderstanding of the RFC, DATA command reinitialize the
+	connection state (thanks to Martin H. Sluka)
+
+2002-12-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.02
+
+	* Fix bug in LMTP, protocol name not set
+
+	* Fix bug in LMTP, data_finished() method used to use the old data
+	handling mechanism (thanks to Andy Turner)
+
+2002-06-20  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.01
+	
+	* Original version; created by h2xs 1.21 with options -n
+	Net::Server::Mail -X
+
