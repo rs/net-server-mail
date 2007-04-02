@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
-our $VERSION = "0.14"
+our $VERSION = "0.14";
 
 =pod
 
@@ -573,6 +573,9 @@ sub data
     return;
 }
 
+# Because data is cutted into pieces (4096 bytes), we have to search
+# "\r\n.\r\n" sequence in 2 consecutive pieces. $self->{last_chunk}
+# contains the last 5 bytes.
 sub data_part
 {
     my($self, $data) = @_;
@@ -593,13 +596,14 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        $data =~ s/^\.\r*\n$//m;
+        ($data = "$self->{last_chunk}$data") =~ s/(\r*\n)\.\r*\n$/$1/s;
         $self->{_data} .= $data;
         return $self->data_finished($more_data);
     }
 
-    # RFC 821 compliance.
-    $data =~ s/^\.\r*\n$//m;
+    my $tmp = $self->{last_chunk};
+    $self->{last_chunk} = substr $data, -5;
+    $data = $tmp . substr $data, 0, -5;
     $self->make_event
       (
        name => 'DATA-PART',
@@ -613,7 +617,6 @@ sub data_part
        success_reply => '', # don't send any reply !
       );
 
-    $self->{last_chunk} = '_'.substr $data, -5;
     return;
 }
 
