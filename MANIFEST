@@ -1,0 +1,18 @@
+Changes
+eg/smtp-gateway.pl
+eg/smtpd-select.pl
+lib/Net/Server/Mail.pm
+lib/Net/Server/Mail/ESMTP.pm
+lib/Net/Server/Mail/ESMTP/8BITMIME.pm
+lib/Net/Server/Mail/ESMTP/Extension.pm
+lib/Net/Server/Mail/ESMTP/PIPELINING.pm
+lib/Net/Server/Mail/ESMTP/XFORWARD.pm
+lib/Net/Server/Mail/LMTP.pm
+lib/Net/Server/Mail/SMTP.pm
+Makefile.PL
+MANIFEST                        This list of files
+META.yml
+README
+t/esmtp.t
+t/lmtp.t
+t/smtp.t

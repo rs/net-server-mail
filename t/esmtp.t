@@ -28,6 +28,7 @@ if(!$pid)
         my $m = new Net::Server::Mail::ESMTP socket => $conn, idle_timeout => 5
             or die "can't start server on port $server_port";
         $m->register('Net::Server::Mail::ESMTP::PIPELINING');
+        $m->register('Net::Server::Mail::ESMTP::XFORWARD');
         $m->process;
     }
 }

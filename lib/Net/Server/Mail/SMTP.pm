@@ -562,7 +562,7 @@ sub data
         return;
     }
 
-    $self->{_last_chunk} = '';
+    $self->{last_chunk} = '';
     $self->make_event
       (
        name => 'DATA-INIT',
@@ -581,7 +581,7 @@ sub data_part
     my($self, $data) = @_;
 
     # search for end of data indicator
-    if("$self->{last_chunk}$data" =~ /^\.\r*\n/m )
+    if("$self->{last_chunk}$data" =~ /\r?\n\.\r?\n/s )
     {
         my $more_data = $';
         if(length $more_data)
@@ -596,7 +596,7 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        ($data = "$self->{last_chunk}$data") =~ s/(\r*\n)\.\r*\n$/$1/s;
+        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n/$1/s;
         $self->{_data} .= $data;
         return $self->data_finished($more_data);
     }

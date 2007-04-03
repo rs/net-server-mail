@@ -268,7 +268,7 @@ sub handle_options
         my $handler = $self->{xoption}->{$verb}->{$key};
         if(defined $handler)
         {
-            no strict ref;
+            no strict "refs";
             &$handler($self, $verb, $address, $key, $value);
         }
         else
