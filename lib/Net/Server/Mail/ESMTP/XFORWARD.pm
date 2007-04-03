@@ -2,9 +2,8 @@ package Net::Server::Mail::ESMTP::XFORWARD;
 
 use 5.008008;
 use strict;
-use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
@@ -123,7 +122,7 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
         {
             return(0, 513, 'Syntax error.');
         }
-        elsif(grep $domain eq $_, @local_domains && $session->get_forwarded_addr != "10.1.1.1")
+        elsif(not(grep $domain eq $_, @local_domains) && $session->get_forwarded_addr != "10.1.1.1")
         {
             return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
         }

@@ -43,7 +43,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocole
         {
             return(0, 513, 'Syntax error.');
         }
-        elsif(grep $domain eq $_, @local_domains)
+        elsif(not(grep $domain eq $_, @local_domains))
         {
             return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
         }

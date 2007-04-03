@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP);
 
+our $VERSION = "0.13";
+
 =pod
 
 =head1 NAME
@@ -43,7 +45,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocole
         {
             return(0, 513, 'Syntax error.');
         }
-        elsif(grep $domain eq $_, @local_domains)
+        elsif(not(grep $domain eq $_, @local_domains))
         {
             return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
         }

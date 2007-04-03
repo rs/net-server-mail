@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
+our $VERSION = "0.14";
+
 sub keyword
 {
     return '8BITMIME';
