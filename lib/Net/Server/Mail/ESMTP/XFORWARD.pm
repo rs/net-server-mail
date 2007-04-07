@@ -1,6 +1,6 @@
 package Net::Server::Mail::ESMTP::XFORWARD;
 
-use 5.008008;
+use 5.006;
 use strict;
 
 our $VERSION = '0.04';
