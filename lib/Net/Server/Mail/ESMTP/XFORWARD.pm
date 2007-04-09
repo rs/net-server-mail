@@ -3,7 +3,7 @@ package Net::Server::Mail::ESMTP::XFORWARD;
 use 5.006;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base qw(Net::Server::Mail::ESMTP::Extension);
 

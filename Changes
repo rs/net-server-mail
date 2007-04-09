@@ -1,5 +1,16 @@
+2007-04-09  Xavier.guimard  <x.guimard@free.fr>
+
+	* Release 0.16
+	* Bug in LMTP tests
+
+2007-04-07  Xavier.guimard  <x.guimard@free.fr>
+
+	* Release 0.15
+	* Little bug: XFORWARD does not depend from 5.008
+
 2007-04-02  Xavier.guimard  <x.guimard@free.fr>
 
+	* Release 0.14
 	* Closes: #18955, #24038, #24280 / rt.cpan.org
 
 2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
