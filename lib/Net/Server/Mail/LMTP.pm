@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP);
 
-our $VERSION = "0.13";
+our $VERSION = "0.16";
 
 =pod
 
@@ -200,26 +200,19 @@ Olivier Poitrey E<lt>rs@rhapsodyk.netE<gt>
 
 =head1 AVAILABILITY
 
-The official FTP location is:
+Available on CPAN.
 
-B<ftp://ftp.rhapsodyk.net/pub/devel/perl/Net-Server-Mail/>
+anonymous SVN repository:
 
-Also available on CPAN.
+svn co https://emailproject.perl.org/svn/Net-Server-Mail
 
-anonymous CVS repository:
+SVN repository on the web:
 
-CVS_RSH=ssh cvs -d anonymous@cvs.rhapsodyk.net:/devel co
-Net-Server-Mail
-
-(supply an empty string as password)
-
-CVS repository on the web:
-
-http://www.rhapsodyk.net/cgi-bin/cvsweb/Net-Server-Mail/
+http://emailproject.perl.org/svn/Net-Server-Mail/
 
 =head1 BUGS
 
-Please send bug-reports to rs-bugs@rhapsodyk.net.
+Please use CPAN system to report a bug (http://rt.cpan.org/).
 
 =head1 LICENCE
 
@@ -240,7 +233,7 @@ USA
 
 =head1 COPYRIGHT
 
-Copyright (C) 2002 - Olivier Poitrey
+Copyright (C) 2002 - Olivier Poitrey, 2007 - Xavier Guimard
 
 =cut
 

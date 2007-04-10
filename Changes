@@ -1,17 +1,15 @@
-2007-04-09  Xavier.guimard  <x.guimard@free.fr>
+Revision history for Perl extension Net::Server::Mail.
 
-	* Release 0.16
-	* Bug in LMTP tests
+0.16  Tue Apr 10 22:00:06 2007
+	- Bug in LMTP tests
+	- documentation update: new repository
 
-2007-04-07  Xavier.guimard  <x.guimard@free.fr>
+0.15  Sat Apr 7 15:45:56 2007
+	- Little bug: XFORWARD does not depend from 5.008
 
-	* Release 0.15
-	* Little bug: XFORWARD does not depend from 5.008
-
-2007-04-02  Xavier.guimard  <x.guimard@free.fr>
-
-	* Release 0.14
-	* Closes: #18955, #24038, #24280 / rt.cpan.org
+0.14  Mon Apr 2 7:15:45 2007
+	- New maintener: Xavier Guimard <guimard@cpan.org>
+	- Closes: #18955, #24038, #24280 / rt.cpan.org
 
 2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
 
