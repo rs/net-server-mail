@@ -596,7 +596,7 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n/$1/s;
+        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n(QUIT\r?\n)?/$1/s;
         $self->{_data} .= $data;
         return $self->data_finished($more_data);
     }
