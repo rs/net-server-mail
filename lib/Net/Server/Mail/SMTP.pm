@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
 =pod
 
@@ -26,7 +26,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocole
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();
-	$conn->close()
+        $conn->close()
     }
 
     sub validate_recipient
@@ -596,8 +596,10 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n(QUIT\r?\n)?/$1/s;
+        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n(QUIT\r?\n)?$/$1/s;
         $self->{_data} .= $data;
+        # RFC 2821 by the letter
+        $self->{_data} =~ s/^\.(.+\015\012)(?!\n)/$1/gm;
         return $self->data_finished($more_data);
     }
 

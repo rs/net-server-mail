@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.17  Mon Mar 17 15:36:10 2008
+	- duplicated leading dot (RFC 2821 not correctly implemented). Closes: #34099
+
 0.16  Tue Apr 10 22:00:06 2007
 	- Bug in LMTP tests
 	- documentation update: new repository
