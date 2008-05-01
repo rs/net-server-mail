@@ -3,7 +3,7 @@ package Net::Server::Mail::ESMTP::XFORWARD;
 use 5.006;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
@@ -31,14 +31,27 @@ sub xforward {
     my $self = shift;
     my $args = shift;
     my %h    = ( $args =~ /(NAME|ADDR|PROTO|HELO|SOURCE)=([^\s]+)\s*/g );
-    $args =~ s/(NAME|ADDR|PROTO|HELO|SOURCE)=[^\s]+\s*//g;
+    $args =~ s/(?:NAME|ADDR|PROTO|HELO|SOURCE)=[^\s]+\s*//g;
     if ( $args !~ /^\s*$/ ) {
         $args =~ s/=.*$//;
         $self->reply( 501, "5.5.4 Bad XFORWARD attribute name: $args" );
     }
     else {
         $self->{"xforward"}->{ lc($_) } = $h{$_} foreach ( keys %h );
-        $self->reply( 250, "2.0.0 Ok" );
+        $self->make_event (
+                name => 'XFORWARD',
+                arguments => [$self->{"xforward"}],
+                on_success => sub
+                {
+                #my $buffer = $self->step_forward_path();
+                #$buffer = [] unless ref $buffer eq 'ARRAY';
+                #push(@$buffer, $address);
+                #$self->step_forward_path($buffer);
+                #$self->step_maildata_path(1);
+                },
+                success_reply => [250, "OK"],
+                failure_reply => [550, 'Failure'],
+                );
     }
     return;
 }
@@ -92,26 +105,36 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
 =head1 SYNOPSIS
 
     use Net::Server::Mail::ESMTP;
-
+    
     my @local_domains = qw(example.com example.org);
     my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
-
+    
     my $conn;
     while($conn = $server->accept)
     {
         my $esmtp = new Net::Server::Mail::ESMTP socket => $conn;
-        # activate some extensions
-        $esmtp->register('Net::Server::Mail::ESMTP::XFORWARD');
+        
+        # activate XFORWARD extension if remote client is localhost
+        $esmtp->register('Net::Server::Mail::ESMTP::XFORWARD')
+           if($server->get_property('peeraddr') =~ /^127/);
         # adding some handlers
         $esmtp->set_callback(RCPT => \&validate_recipient);
+        # adding XFORWARD handler
+        $esmtp->set_callback(XFORWARD => \&xforward);
         $esmtp->process();
 	$conn->close()
     }
-
+    
+    sub xforward {
+        my $self = shift;
+        # Reject non IPV4 addresses
+        return 0 unless( $self->get_forwarded_address =~ /^\d+\.\d+\.\d+\.\d+$/ );
+        1;
+    }
+    
     sub validate_recipient
     {
         my($session, $recipient) = @_;
-
         my $domain;
         if($recipient =~ /@(.*)>\s*$/)
         {
@@ -126,7 +149,7 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
         {
             return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
         }
-
+    
         return(1);
     }
 
