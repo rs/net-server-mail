@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
+our $VERSION = "0.17";
+
 =pod
 
 =head1 NAME
@@ -24,7 +26,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocole
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();
-	$conn->close()
+        $conn->close()
     }
 
     sub validate_recipient
@@ -41,7 +43,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocole
         {
             return(0, 513, 'Syntax error.');
         }
-        elsif(grep $domain eq $_, @local_domains)
+        elsif(not(grep $domain eq $_, @local_domains))
         {
             return(0, 554, "$recipient: Recipient address rejected: Relay access denied");
         }
@@ -560,6 +562,7 @@ sub data
         return;
     }
 
+    $self->{last_chunk} = '';
     $self->make_event
       (
        name => 'DATA-INIT',
@@ -570,12 +573,15 @@ sub data
     return;
 }
 
+# Because data is cutted into pieces (4096 bytes), we have to search
+# "\r\n.\r\n" sequence in 2 consecutive pieces. $self->{last_chunk}
+# contains the last 5 bytes.
 sub data_part
 {
     my($self, $data) = @_;
 
     # search for end of data indicator
-    if($data =~ /^\.\r?\n/m)
+    if("$self->{last_chunk}$data" =~ /\r?\n\.\r?\n/s )
     {
         my $more_data = $';
         if(length $more_data)
@@ -590,13 +596,16 @@ sub data_part
         }
         
         # RFC 821 compliance.
-        ($data = $`) =~ s/^\.//mg;
+        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n(QUIT\r?\n)?$/$1/s;
         $self->{_data} .= $data;
+        # RFC 2821 by the letter
+        $self->{_data} =~ s/^\.(.+\015\012)(?!\n)/$1/gm;
         return $self->data_finished($more_data);
     }
 
-    # RFC 821 compliance.
-    $data =~ s/^\.//mg;
+    my $tmp = $self->{last_chunk};
+    $self->{last_chunk} = substr $data, -5;
+    $data = $tmp . substr $data, 0, -5;
     $self->make_event
       (
        name => 'DATA-PART',
@@ -725,26 +734,19 @@ Olivier Poitrey E<lt>rs@rhapsodyk.netE<gt>
 
 =head1 AVAILABILITY
 
-The official FTP location is:
+Available on CPAN.
 
-B<ftp://ftp.rhapsodyk.net/pub/devel/perl/Net-Server-Mail/>
+anonymous SVN repository:
 
-Also available on CPAN.
+svn co https://emailproject.perl.org/svn/Net-Server-Mail
 
-anonymous CVS repository:
+SVN repository on the web:
 
-CVS_RSH=ssh cvs -d anonymous@cvs.rhapsodyk.net:/devel co
-Net-Server-Mail
-
-(supply an empty string as password)
-
-CVS repository on the web:
-
-http://www.rhapsodyk.net/cgi-bin/cvsweb/Net-Server-Mail/
+http://emailproject.perl.org/svn/Net-Server-Mail/
 
 =head1 BUGS
 
-Please send bug-reports to rs-bugs@rhapsodyk.net.
+Please use CPAN system to report a bug (http://rt.cpan.org/).
 
 =head1 LICENCE
 
@@ -765,7 +767,11 @@ USA
 
 =head1 COPYRIGHT
 
+<<<<<<< HEAD:lib/Net/Server/Mail/SMTP.pm
 Copyright (C) 2002 - Olivier Poitrey
+=======
+Copyright (C) 2002 - Olivier Poitrey, 2007 - Xavier Guimard
+>>>>>>> new/master:lib/Net/Server/Mail/SMTP.pm
 
 =cut
 

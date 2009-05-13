@@ -48,7 +48,7 @@ ok($lmtp->to('bad'));
 ok($lmtp->to('postmaster'));
 ok($lmtp->data);
 ok($lmtp->datasend('To: postmaster'));
-ok(!$lmtp->dataend);
+ok($lmtp->dataend);
 ok($lmtp->response);
 ok($lmtp->quit);
 

@@ -3,6 +3,8 @@ package Net::Server::Mail::ESMTP::Extension;
 use 5.006;
 use strict;
 
+our $VERSION = "0.14";
+
 =pod
 
 =head1 NAME

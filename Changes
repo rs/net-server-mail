@@ -1,3 +1,22 @@
+Revision history for Perl extension Net::Server::Mail.
+
+0.17  Mon Mar 17 15:36:10 2008
+	- duplicated leading dot (RFC 2821 not correctly implemented). Closes: #34099
+
+0.16  Tue Apr 10 22:00:06 2007
+	- Bug in LMTP tests
+	- documentation update: new repository
+	- Bug correction (closes #27154): When QUIT is sent without waiting server
+	  notification, QUIT can be found in string concatenated with body data
+	  (thanks to Raffaello Torraco, Sebastiano Piccoli & Valerio Paolini).
+
+0.15  Sat Apr 7 15:45:56 2007
+	- Little bug: XFORWARD does not depend from 5.008
+
+0.14  Mon Apr 2 7:15:45 2007
+	- New maintener: Xavier Guimard <guimard@cpan.org>
+	- Closes: #18955, #24038, #24280 / rt.cpan.org
+
 2006-01-10  Olivier Poitrey  <rs@rhapsodyk.net>
 
 	* Release 0.14
