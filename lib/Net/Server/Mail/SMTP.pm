@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 =pod
 
@@ -384,7 +384,14 @@ sub mail
         return;
     }
 
-    my($address, @options) = split(' ', $args);
+    my($address, $rest, @options);
+    unless (($address, $rest) = $args =~ /^<(.*?)>(?: (\S.*))?$/) {
+        $self->reply(501, 'Syntax error in parameters or arguments');
+        return;
+    }
+    if ($rest) {
+        @options = split ' ', $rest;
+    }
 
     unless($self->handle_options('MAIL', $address, @options))
     {
@@ -433,7 +440,14 @@ sub rcpt
         return;
     }
 
-    my($address, @options) = split(' ', $args);
+    my($address, $rest, @options);
+    unless (($address, $rest) = $args =~ /^<(.*?)>(?: (\S.*))?$/) {
+        $self->reply(501, 'Syntax error in parameters or arguments');
+        return;
+    }
+    if ($rest) {
+        @options = split ' ', $rest;
+    }
 
     unless($self->handle_options('RCPT', $address, @options))
     {
@@ -581,6 +595,7 @@ sub data_part
     my($self, $data) = @_;
 
     # search for end of data indicator
+    $data ||= '';
     if("$self->{last_chunk}$data" =~ /\r?\n\.\r?\n/s )
     {
         my $more_data = $';
@@ -605,7 +620,7 @@ sub data_part
 
     my $tmp = $self->{last_chunk};
     $self->{last_chunk} = substr $data, -5;
-    $data = $tmp . substr $data, 0, -5;
+    $data = $tmp . ($data ? substr ($data, 0, -5) : '');
     $self->make_event
       (
        name => 'DATA-PART',

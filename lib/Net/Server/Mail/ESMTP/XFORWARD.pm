@@ -157,10 +157,10 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
 
 When using a Net::Server::Mail::ESMTP script inside a MTA and not in front of
 Internet, values like client IP address are not accessible to the script and
-when the script returns mail to an other instance of smtpd daemon, it logs
+when the script returns mail to another instance of smtpd daemon, it logs
 "localhost" as incoming address. To solve this problem, some administrators use
 the XFORWARD command. This module gives the ability to read and store XFORWARD
-informations.
+information.
 
 =head2 METHODS
 
@@ -186,6 +186,8 @@ announced itself. It may be a non-DNS hostname.
 =item * get_forwarded_proto : returns the mail protocol for receiving mail from
 the up-stream host. This may be an SMTP or non-SMTP protocol name of up to 64
 characters.
+
+=back
 
 =head1 SEE ALSO
 

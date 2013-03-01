@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.16';
+$Net::Server::Mail::VERSION = '0.18';
 
 =pod
 
@@ -475,6 +475,7 @@ sub process
         defined($in->blocking(0)) or die "Couldn't set nonblocking: $^E";
     }
     
+    my $linebuf = '';
     while($sel->can_read($self->{options}->{idle_timeout} || undef))
     {
         if ($^O eq 'MSWin32')
@@ -491,6 +492,13 @@ sub process
         {
             my @lines = <$in>;
             @lines = grep(defined, @lines);
+            if ( (scalar @lines > 0) && (length($linebuf) > 0) ) {
+                $lines[0] = $linebuf . $lines[0];
+                $linebuf = '';
+            }
+            if ( (scalar @lines > 0) && ($lines[$#lines] !~ /[\r\n]$/) ) {
+                $linebuf = pop @lines;
+            }
 
             if(scalar @lines) {
                 $_ = join '', @lines;
@@ -500,7 +508,7 @@ sub process
         }
         
         # do not go into an infinit loop if client close the connection
-        last unless defined $_;
+        last unless (defined $_ || length($linebuf));
 
         my $rv;
         if(defined $self->next_input_to())

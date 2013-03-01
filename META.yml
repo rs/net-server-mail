@@ -1,11 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-Server-Mail
-version:      0.17
-version_from: lib/Net/Server/Mail.pm
-installdirs:  site
+--- #YAML:1.0
+name:               Net-Server-Mail
+version:            0.18
+abstract:           Class to easily create a mail server
+author:
+    - Olivier Poitrey <rs@rhapsodyk.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-    Net::SMTP:                     0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+    Net::SMTP:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
