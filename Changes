@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.19  Sun Feb 3 11:52:54 2013
+	- Add STARTTLS extension
+	- Fix spelling errors
+
 0.18  Sun May 13 12:04:25 2012
 	- Close bug #75360 : Net::Server::Mail incorrectly processes incomplete
 	  lines during SMTP session
