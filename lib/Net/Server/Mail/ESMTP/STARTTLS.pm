@@ -115,4 +115,38 @@ Net::Server::Mail::ESMTP's constructor. It contains options for
 IO::Socket::SSL's constructor. Please refer to IO::Socket::SSL's
 perldoc for details.
 
+=head1 SEE ALSO
+
+Please, see L<Net::Server::Mail>
+
+=head1 AUTHOR
+
+Mytram <rmytram@gmail.com>
+
+=head1 AVAILABILITY
+
+Available on CPAN.
+
+anonymous Git repository:
+
+git clone git://github.com/rs/net-server-mail.git
+
+Git repository on the web:
+
+L<https://github.com/rs/net-server-mail>
+
+=head1 BUGS
+
+Please use CPAN system to report a bug (http://rt.cpan.org/).
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
 =cut
