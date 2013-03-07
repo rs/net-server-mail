@@ -17,59 +17,70 @@ use Carp;
 # to fail to read commands correctly
 
 use IO::Socket::SSL 1.831;
-use base qw(Net::Server::Mail::ESMTP::Extension);
+use Net::Server::Mail::ESMTP::Extension;
+our @ISA = qw(Net::Server::Mail::ESMTP::Extension);
 
-our $VERSION = 0.01;
+our $VERSION = 0.19_01;
 
 use constant {
-	REPLY_READY_TO_START	=> 220,
-	REPLY_SYNTAX_ERROR	=> 502,
-	REPLY_NOT_AVAILABLE	=> 454,
+    REPLY_READY_TO_START => 220,
+    REPLY_SYNTAX_ERROR   => 502,
+    REPLY_NOT_AVAILABLE  => 454,
 };
 
 # https://tools.ietf.org/html/rfc2487
 
 sub verb {
     my $self = shift;
-    return ([ 'STARTTLS' => \&starttls ]);
+    return ( [ 'STARTTLS' => \&starttls ] );
 }
 
 sub keyword { 'STARTTLS' }
 
-
 # Return a non undef to signal the server to close the socket.
 sub starttls {
     my $server = shift;
-    my $args = shift;
+    my $args   = shift;
 
     if ($args) {
-	# No parameter verb
-        $server->reply(REPLY_SYNTAX_ERROR,  'Syntax error (no parameters allowed)');
+
+        # No parameter verb
+        $server->reply( REPLY_SYNTAX_ERROR,
+            'Syntax error (no parameters allowed)' );
         return;
     }
 
-    my $ssl_config = $server->{options}{ssl_config} if exists $server->{options}{ssl_config};
-    if ( !$ssl_config || ref $ssl_config ne 'HASH'  ) {
-        $server->reply(REPLY_NOT_AVAILABLE, 'TLS not available due to temporary reason');
+    my $ssl_config = $server->{options}{ssl_config}
+      if exists $server->{options}{ssl_config};
+    if ( !$ssl_config || ref $ssl_config ne 'HASH' ) {
+        $server->reply( REPLY_NOT_AVAILABLE,
+            'TLS not available due to temporary reason' );
         return;
     }
 
-    $server->reply(REPLY_READY_TO_START, 'Ready to start TLS');
+    $server->reply( REPLY_READY_TO_START, 'Ready to start TLS' );
 
-    my $ssl_socket = IO::Socket::SSL->start_SSL(
-        $server->{options}{socket},
-        %$ssl_config,
-        SSL_server => 1,
-    );
+    my $ssl_socket = IO::Socket::SSL->start_SSL( $server->{options}{socket},
+        %$ssl_config, SSL_server => 1, );
 
     # Use SSL_startHandshake to control nonblocking behaviour
     # See perldoc IO::Socket::SSL for more
 
     if ( !$ssl_socket || !$ssl_socket->isa('IO::Socket::SSL') ) {
-        return 0; # to single the server to close the socket
+        $server->reply( REPLY_NOT_AVAILABLE,
+                'TLS not available due to temporary reason ['
+              . IO::Socket::SSL::errstr()
+              . ']' );
+        return 0;    # to single the server to close the socket
     }
 
-    return;
+    my $ref = $server->{callback}->{STARTTLS};
+    if ( defined $ref && ref $ref eq 'ARRAY' && ref $ref->[0] eq 'CODE' ) {
+        my $code = $ref->[0];
+        &$code($server);
+    }
+
+    return ();
 }
 
 1;
@@ -97,11 +108,21 @@ Net::Server::Mail::ESMTP::STARTTLS - A module to suport the STARTTLS command in 
                 # Any other options taken by IO::Socket::SSL
             }
        );
+       
        # activate some extensions
        $esmtp->register('Net::Server::Mail::ESMTP::STARTTLS');
-       # adding some handlers
+       
+       # adding optional STARTTLS handler
+       $esmtp->set_callback(STARTTLS => \&tls_started);
        $esmtp->process();
        $conn->close()
+   }
+   
+   sub tls_started {
+       my ($session) = @_;
+
+       # Now, allow authentication
+       $session->register('Net::Server::Mail::ESMTP::AUTH');
    }
 
 =head1 DESCRIPTION
@@ -121,7 +142,16 @@ Please, see L<Net::Server::Mail>
 
 =head1 AUTHOR
 
-Mytram <rmytram@gmail.com>
+This module has been writed by Xavier Guimard <x.guimard@free.fr> using libs
+written by:
+
+=over
+
+=item Mytram <rmytram@gmail.com>
+
+=item Dan Moore C<< <dan at moore.cx> >>
+
+=back
 
 =head1 AVAILABILITY
 
@@ -141,7 +171,15 @@ Please use CPAN system to report a bug (http://rt.cpan.org/).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+=over
+
+=item Copyright (C) 2009 - Dan Moore <dan at moore.cx>
+
+=item Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+
+=item Copyright (C) 2013 - Xavier Guimard <x.guimard@free.fr>
+
+=back
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
