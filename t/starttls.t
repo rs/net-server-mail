@@ -1,5 +1,10 @@
-#use strict;
-#use warnings;
+# Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+# Copyright (C) 2013 - Xavier Guimard <x.guimard@free.fr>
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of either: the GNU General Public License as published
+# by the Free Software Foundation; or the Artistic License.
+#
+# See http://dev.perl.org/licenses/ for more information.
 
 use IO::Socket::INET;
 use Net::Server::Mail::ESMTP;
@@ -9,7 +14,7 @@ use IO::Socket::SSL qw(1.831 SSL_VERIFY_NONE);
 use Net::SMTP;
 use Net::Cmd;
 
-use Test::Most tests => 15;
+use Test::Most;
 
 use constant {
 	OK       => 250,
@@ -23,7 +28,7 @@ use warnings;
 my (@tests, @socks);
 
 my $host = '127.0.0.1';
-my $port = 9988;
+my $port = 20000 + int(rand(1000));
 my $sender = 'sender@example.com';
 my $recip1 = 'recip1@example.com';
 my $recip2 = 'recip2@example.com';
@@ -102,7 +107,7 @@ push @tests, [ 'STARTTLS handshake', sub {
 	);
 
 	(defined $rv && ref $rv eq 'IO::Socket::SSL')
-		or die "TLS handeshake failed";
+		or die "TLS handshake failed ".IO::Socket::SSL::errstr();
 
 	$s->close;
 
@@ -192,6 +197,9 @@ sub upgrade_to_tls {
 push @tests, [ 'TLS and quit', sub {
 	my $s = _Net::SMTPS->new($host, Port => $port, Hello => 'localhost');
 
+    unless(defined $s) {
+        return 1;
+    }
 	$s->quit;
 
 	return 1;
@@ -200,6 +208,9 @@ push @tests, [ 'TLS and quit', sub {
 
 push @tests, [ 'TLS and send message', sub {
 	my $s = _Net::SMTPS->new($host, Port => $port);
+    unless(defined $s) {
+        return 1;
+    }
 	$s->mail($sender);
 	$s->to($recip1, $recip2);
 	$s->data();
@@ -247,11 +258,7 @@ sub process_test {
 
 	$smtp->set_callback( DATA => $test->[2]{DATA} || sub {} );
 
-	diag("Processing");
-
 	$smtp->process();
-
-	diag("Done");
 
 	$client->close;
 	shift @socks;
@@ -273,7 +280,8 @@ if (!defined $pid) {
 	if (!$sock) {
 		kill 9, $pid;
 		diag("kill 9 $pid (child)");
-		die "Cannot create sock: $!";
+		plan skip_all => "Cannot create sock: $!";
+        exit;
 	}
 
 	push @socks, $sock;
@@ -288,7 +296,7 @@ if (!defined $pid) {
 	wait;
 	$sock->close;
 
-	done_testing;
+	done_testing();
 	exit;
 } else {
 	# child
