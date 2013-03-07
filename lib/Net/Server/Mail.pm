@@ -9,7 +9,7 @@ use Carp;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.19_01';
+$Net::Server::Mail::VERSION = '0.19_02';
 
 =pod
 
@@ -475,53 +475,66 @@ sub process
         defined($in->blocking(0)) or die "Couldn't set nonblocking: $^E";
     }
     
-    my $linebuf = '';
-    while($sel->can_read($self->{options}->{idle_timeout} || undef))
-    {
-        if ($^O eq 'MSWin32')
-        {
-            # see how much data is available to read
-            my $size = pack("L",0);
-            ioctl($in, 1074030207, $size);
-            $size = unpack("L", $size);
+    my $buffer = ""; 
+    while (1) {
+        # wait for data and read it
+        my $rv = undef;
 
-            # read the data and put it in the $_ variable
-            read($in, $_, $size);
-        }
-        else
+        if ($sel->can_read($self->{options}->{idle_timeout} || undef))
         {
-            my @lines = <$in>;
-            @lines = grep(defined, @lines);
-            if ( (scalar @lines > 0) && (length($linebuf) > 0) ) {
-                $lines[0] = $linebuf . $lines[0];
-                $linebuf = '';
-            }
-            if ( (scalar @lines > 0) && ($lines[$#lines] !~ /[\r\n]$/) ) {
-                $linebuf = pop @lines;
-            }
+            if ($^O eq 'MSWin32')
+            {
+                # see how much data is available to read
+                my $size = pack("L",0);
+                ioctl($in, 1074030207, $size);
+                $size = unpack("L", $size);
 
-            if(scalar @lines) {
-                $_ = join '', @lines;
-            } else {
-                $_ = undef;
+                # read the data to $buffer
+                $rv = sysread($in, $buffer, $size, length($buffer));
+            }
+            else
+            {
+                $rv = sysread($in, $buffer, 512*1024, length($buffer));
             }
         }
-        
-        # do not go into an infinit loop if client close the connection
-        last unless (defined $_ || length($linebuf));
+        if ((not defined $rv) or ($rv == 0)) {
+            # timeout, read error or connection closed
+            last;
+        }
 
-        my $rv;
-        if(defined $self->next_input_to())
-        {
-            $rv = $self->tell_next_input_method($_);
+        # process all terminated lines
+        # Note: Should accept only CRLF according to RFC. We accept
+        # plain LFs anyway because its more liberal and works as well.
+        my $newline_idx = rindex($buffer, "\n");
+        if ($newline_idx >= 0) {
+            # one or more lines, terminated with \r?\n
+            my $chunk = substr($buffer, 0, $newline_idx+1);
+            # remaining buffer
+            $buffer = substr($buffer, $newline_idx+1);
+
+            my $rv;
+            if(defined $self->next_input_to())
+            {
+                $rv = $self->tell_next_input_method($chunk);
+            }
+            else
+            {
+                $rv = $self->{process_operation}($self, $chunk);
+            }
+            # if $rv is defined, we have to close the connection
+            if (defined $rv) {
+                return $rv;
+            }
         }
-        else
-        {
-            next unless defined;
-            $rv = $self->{process_operation}($self, $_);
+
+        # limit the size of lines to protect from excessive memory consumption
+        # (RFC specifies 1000 bytes including \r\n)
+        if (length($buffer) > 1000) {
+            $self->make_event(
+                name => 'linetobig',
+                success_reply => [552, 'line too long' ]);
+            return 1;
         }
-        # if $rv is defined, we have to close the connection
-        return $rv if defined $rv;
     }
 
     $self->timeout;
@@ -758,7 +771,13 @@ USA
 
 =head1 COPYRIGHT
 
-Copyright (C) 2002 - Olivier Poitrey, 2007 - Xavier Guimard
+=over
+
+=item Copyright (C) 2002 - Olivier Poitrey
+
+=item Copyright (C) 2007-2013 - Xavier Guimard
+
+=item Copyright (C) 2012 - Georg Hoesch
 
 =cut
 

@@ -1,8 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
-0.19_01  Thu Mar 7 13:06:45 2013
+0.19_02  Thu Mar 7 13:06:45 2013
 	DEV RELEASE
 	- Merge Dan Moore and Mytram versions of STARTTLS
+	- Include patch proposed by Georg Hoesch to reduce memory consumption
 
 0.19  Sun Mar 3 11:52:54 2013
 	- Add STARTTLS extension
