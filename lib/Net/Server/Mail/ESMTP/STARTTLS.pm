@@ -20,7 +20,7 @@ use IO::Socket::SSL 1.831;
 use Net::Server::Mail::ESMTP::Extension;
 our @ISA = qw(Net::Server::Mail::ESMTP::Extension);
 
-our $VERSION = 0.19_01;
+our $VERSION = 0.20;
 
 use constant {
     REPLY_READY_TO_START => 220,
