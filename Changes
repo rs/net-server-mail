@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.20  Thu May 14 05:50:12 2013
+	- Update copyright
+
 0.19_02  Thu Mar 7 13:06:45 2013
 	DEV RELEASE
 	- Merge Dan Moore and Mytram versions of STARTTLS

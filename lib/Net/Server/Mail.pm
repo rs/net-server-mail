@@ -777,7 +777,27 @@ USA
 
 =item Copyright (C) 2007-2013 - Xavier Guimard
 
-=item Copyright (C) 2012 - Georg Hoesch
+=back
+
+=head2 STARTTLS
+
+=over
+
+=item Copyright (C) 2009 - Dan Moore <dan at moore.cx>
+
+=item Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+
+=item Copyright (C) 2013 - Xavier Guimard <x.guimard@free.fr>
+
+=back
+
+=head2 Contributors
+
+=over
+
+=item 2012 - Georg Hoesch (patch to reduce memory consumption)
+
+=back
 
 =cut
 
