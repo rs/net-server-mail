@@ -87,7 +87,7 @@ sub starttls {
 
 =head1 NAME
 
-Net::Server::Mail::ESMTP::STARTTLS - A module to suport the STARTTLS command in Net::Server::Mail::ESMTP
+Net::Server::Mail::ESMTP::STARTTLS - A module to support the STARTTLS command in Net::Server::Mail::ESMTP
 
 =head1 SYNOPSIS
 
