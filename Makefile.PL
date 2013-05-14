@@ -16,4 +16,9 @@ WriteMakefile(
           )
         : ()
     ),
+    META_MERGE => {
+        recommends => {
+            'IO::Socket::SSL' => 1.831,
+        },
+    },
 );

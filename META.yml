@@ -1,17 +1,18 @@
 --- #YAML:1.0
 name:               Net-Server-Mail
-version:            0.18
+version:            0.20
 abstract:           Class to easily create a mail server
 author:
-    - Olivier Poitrey <rs@rhapsodyk.net>
+    - Xavier Guimard <x.guimard@free.fr>
 license:            unknown
 distribution_type:  module
 configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
-    ExtUtils::MakeMaker:  0
+    Test::Most:  0
 requires:
-    Net::SMTP:  0
+    IO::Socket::SSL:  1.831
+    Net::SMTP:        0
 no_index:
     directory:
         - t
@@ -20,3 +21,5 @@ generated_by:       ExtUtils::MakeMaker version 6.57_05
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
+recommends:
+    IO::Socket::SSL:  1.831
