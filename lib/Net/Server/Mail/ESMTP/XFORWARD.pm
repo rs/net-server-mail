@@ -2,14 +2,16 @@ package Net::Server::Mail::ESMTP::XFORWARD;
 
 use 5.006;
 use strict;
+use Scalar::Util qw(weaken);
 
-our $VERSION = '0.06';
+our $VERSION = '0.21';
 
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
 sub init {
     my ( $self, $parent ) = @_;
     $self->{parent} = $parent;
+    weaken( $self->{parent} );
     return $self;
 }
 

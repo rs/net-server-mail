@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail::ESMTP::Extension';
 use constant GROUP_COMMANDS => [qw(RSET MAIL SEND SOML SAML RCPT)];
+use Scalar::Util qw(weaken);
 
 our $VERSION = 0.13;
 
@@ -11,6 +12,7 @@ sub init
 {
     my($self, $parent) = @_;
     $self->{parent} = $parent;
+    weaken( $self->{parent} );
     return $self;
 }
 
