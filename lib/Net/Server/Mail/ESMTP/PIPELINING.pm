@@ -8,49 +8,37 @@ use Scalar::Util qw(weaken);
 
 our $VERSION = 0.13;
 
-sub init
-{
-    my($self, $parent) = @_;
+sub init {
+    my ( $self, $parent ) = @_;
     $self->{parent} = $parent;
     weaken( $self->{parent} );
     return $self;
 }
 
-sub extend_mode
-{
-    my($self, $mode) = @_;
-    if($mode)
-    {
-        $self->{old_process_operation} =
-            $self->{parent}->{process_operation};
-        $self->{parent}->{process_operation} =
-            \&process_operation;
-        $self->{old_handle_more} =
-            $self->{parent}->{data_handle_more_data};
+sub extend_mode {
+    my ( $self, $mode ) = @_;
+    if ($mode) {
+        $self->{old_process_operation} = $self->{parent}->{process_operation};
+        $self->{parent}->{process_operation} = \&process_operation;
+        $self->{old_handle_more} = $self->{parent}->{data_handle_more_data};
         $self->{parent}->{data_handle_more_data} = 1;
     }
-    else
-    {
-        if(exists($self->{old_process_operation}))
-        {
+    else {
+        if ( exists( $self->{old_process_operation} ) ) {
             $self->{parent}->{process_operation} =
-                $self->{old_process_operation};
+              $self->{old_process_operation};
         }
-        if(exists($self->{old_handle_more}))
-        {
-            $self->{parent}->{data_handle_more_data} = 
-                $self->{old_handle_more};
+        if ( exists( $self->{old_handle_more} ) ) {
+            $self->{parent}->{data_handle_more_data} = $self->{old_handle_more};
         }
     }
 }
 
-sub process_operation
-{
-    my($self, $operation) = @_;
-    my @commands = grep(length $_, split(/\r?\n/, $operation));
-    for(my $i = 0; $i <= $#commands; $i++)
-    {
-        my($verb, $params) = $self->tokenize_command($commands[$i]);
+sub process_operation {
+    my ( $self, $operation ) = @_;
+    my @commands = grep( length $_, split( /\r?\n/, $operation ) );
+    for ( my $i = 0 ; $i <= $#commands ; $i++ ) {
+        my ( $verb, $params ) = $self->tokenize_command( $commands[$i] );
 
         # Once the client SMTP has confirmed that support exists for
         # the pipelining extension, the client SMTP may then elect to
@@ -63,20 +51,20 @@ sub process_operation
         # since their success or failure produces a change of state
         # which the client SMTP must accommodate. (NOOP is included in
         # this group so it can be used as a synchronization point.)
-        if($i < $#commands && not grep($verb eq $_, @{(GROUP_COMMANDS)}))
+        if ( $i < $#commands && not grep( $verb eq $_, @{ (GROUP_COMMANDS) } ) )
         {
-            $self->reply(550, "Protocol error: `$verb' not allowed in a group of commands");
+            $self->reply( 550,
+                "Protocol error: `$verb' not allowed in a group of commands" );
             return;
         }
 
-        my $rv = $self->process_command($verb, $params);
+        my $rv = $self->process_command( $verb, $params );
         return $rv if defined $rv;
     }
-    return
+    return;
 }
 
-sub keyword
-{
+sub keyword {
     return 'PIPELINING';
 }
 

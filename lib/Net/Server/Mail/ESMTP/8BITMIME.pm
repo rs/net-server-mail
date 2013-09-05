@@ -6,21 +6,15 @@ use base qw(Net::Server::Mail::ESMTP::Extension);
 
 our $VERSION = "0.14";
 
-sub keyword
-{
+sub keyword {
     return '8BITMIME';
 }
 
-sub option
-{
-    return
-    (
-        ['MAIL', BODY => \&option_mail_body],
-    );
+sub option {
+    return ( [ 'MAIL', BODY => \&option_mail_body ], );
 }
 
-sub option_mail_body
-{
+sub option_mail_body {
     return;
 }
 

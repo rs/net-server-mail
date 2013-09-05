@@ -78,16 +78,15 @@ L<Net::Server::Mail::ESMTP> for documentation of common methods.
 
 =cut
 
-sub init
-{
-    my($self, @args) = @_;
+sub init {
+    my ( $self, @args ) = @_;
     my $rv = $self->SUPER::init(@args);
     return $rv unless $rv eq $self;
 
     $self->undef_verb('HELO');
     $self->undef_verb('EHLO');
 
-    $self->def_verb(LHLO => 'lhlo');
+    $self->def_verb( LHLO => 'lhlo' );
 
     # Required by RFC
     $self->register('Net::Server::Mail::ESMTP::PIPELINING');
@@ -95,8 +94,7 @@ sub init
     return $self;
 }
 
-sub get_protoname
-{
+sub get_protoname {
     return 'LMTP';
 }
 
@@ -114,31 +112,27 @@ Same as ESMTP EHLO, please see L<Net::Server::Mail::ESMTP>.
 
 =cut
 
-sub lhlo
-{
-    my($self, $hostname) = @_;
+sub lhlo {
+    my ( $self, $hostname ) = @_;
 
-    unless(defined $hostname && length $hostname)
-    {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    unless ( defined $hostname && length $hostname ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
 
     my $response = $self->get_hostname . ' Service ready';
 
     my @extends;
-    foreach my $extend ($self->get_extensions)
-    {
-        push(@extends, join(' ', $extend->keyword, $extend->parameter));
+    foreach my $extend ( $self->get_extensions ) {
+        push( @extends, join( ' ', $extend->keyword, $extend->parameter ) );
     }
 
     $self->extend_mode(1);
-    $self->make_event
-    (
-        name => 'LHLO',
-        arguments => [$hostname, \@extends],
-        on_success => sub
-        {
+    $self->make_event(
+        name       => 'LHLO',
+        arguments  => [ $hostname, \@extends ],
+        on_success => sub {
+
             # according to the RFC, LHLO ensures "that both the SMTP client
             # and the SMTP server are in the initial state"
             $self->{extend_mode} = 1;
@@ -146,7 +140,7 @@ sub lhlo
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
-        success_reply => [250, [$response, @extends]],
+        success_reply => [ 250, [ $response, @extends ] ],
     );
 
     return;
@@ -162,20 +156,17 @@ first argument followed by the current recipient.
 
 =cut
 
-sub data_finished
-{
-    my($self) = @_;
-    
+sub data_finished {
+    my ($self) = @_;
+
     my $recipients = $self->step_forward_path();
 
-    foreach my $forward_path (@$recipients)
-    {
-        $self->make_event
-        (
-            name => 'DATA',
-            arguments => [\$self->{_data}, $forward_path],
-            success_reply => [250, 'Ok'],
-            failure_reply => [550, "$forward_path Failed"],
+    foreach my $forward_path (@$recipients) {
+        $self->make_event(
+            name          => 'DATA',
+            arguments     => [ \$self->{_data}, $forward_path ],
+            success_reply => [ 250, 'Ok' ],
+            failure_reply => [ 550, "$forward_path Failed" ],
         );
     }
 

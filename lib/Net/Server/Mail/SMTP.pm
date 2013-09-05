@@ -82,26 +82,25 @@ SMTP specific methods.
 
 =cut
 
-sub init
-{
-    my($self, @args) = @_;
+sub init {
+    my ( $self, @args ) = @_;
     my $rv = $self->SUPER::init(@args);
     return $rv unless $rv eq $self;
 
-    $self->def_verb(HELO => 'helo');
-    $self->def_verb(VRFY => 'vrfy');
-    $self->def_verb(EXPN => 'expn');
-    $self->def_verb(TURN => 'turn');
-    $self->def_verb(HELP => 'help');
-    $self->def_verb(NOOP => 'noop');
-    $self->def_verb(MAIL => 'mail');
-    $self->def_verb(RCPT => 'rcpt');
-    $self->def_verb(SEND => 'send');
-    $self->def_verb(SOML => 'soml');
-    $self->def_verb(SAML => 'saml');
-    $self->def_verb(DATA => 'data');
-    $self->def_verb(RSET => 'rset');
-    $self->def_verb(QUIT => 'quit');
+    $self->def_verb( HELO => 'helo' );
+    $self->def_verb( VRFY => 'vrfy' );
+    $self->def_verb( EXPN => 'expn' );
+    $self->def_verb( TURN => 'turn' );
+    $self->def_verb( HELP => 'help' );
+    $self->def_verb( NOOP => 'noop' );
+    $self->def_verb( MAIL => 'mail' );
+    $self->def_verb( RCPT => 'rcpt' );
+    $self->def_verb( SEND => 'send' );
+    $self->def_verb( SOML => 'soml' );
+    $self->def_verb( SAML => 'saml' );
+    $self->def_verb( DATA => 'data' );
+    $self->def_verb( RSET => 'rset' );
+    $self->def_verb( QUIT => 'quit' );
 
     # go to the initial step
     $self->step_reverse_path(0);
@@ -114,37 +113,31 @@ sub init
     return $self;
 }
 
-sub step_reverse_path
-{
-    my($self, $bool) = @_;
-    if(defined $bool)
-    {
+sub step_reverse_path {
+    my ( $self, $bool ) = @_;
+    if ( defined $bool ) {
         $self->{reverse_path} = $bool;
     }
 
     return $self->{reverse_path};
 }
 
-sub step_forward_path
-{
-    my($self, $bool) = @_;
-    if(defined $bool)
-    {
+sub step_forward_path {
+    my ( $self, $bool ) = @_;
+    if ( defined $bool ) {
         $self->{forward_path} = $bool;
     }
 
     return $self->{forward_path};
 }
 
-sub step_maildata_path
-{
-    my($self, $bool) = @_;
-    if(defined $bool)
-    {
+sub step_maildata_path {
+    my ( $self, $bool ) = @_;
+    if ( defined $bool ) {
         $self->{maildata_path} = $bool;
+
         # initialise data container
-        if(not $bool)
-        {
+        if ( not $bool ) {
             $self->{_data} = '';
         }
     }
@@ -152,8 +145,7 @@ sub step_maildata_path
     return $self->{maildata_path};
 }
 
-sub get_protoname
-{
+sub get_protoname {
     return 'SMTP';
 }
 
@@ -166,11 +158,10 @@ reverse path step is not complete.
 
 =cut
 
-sub get_sender
-{
-    my($self) = @_;
+sub get_sender {
+    my ($self) = @_;
     my $sender = $self->step_reverse_path();
-    return($sender ? $sender : undef);
+    return ( $sender ? $sender : undef );
 }
 
 =pod
@@ -183,11 +174,10 @@ recipients succeed.
 
 =cut
 
-sub get_recipients
-{
-    my($self) = @_;
+sub get_recipients {
+    my ($self) = @_;
     my $recipients = $self->step_forward_path();
-    return(ref $recipients ? @$recipients : undef)
+    return ( ref $recipients ? @$recipients : undef );
 }
 
 =pod
@@ -219,29 +209,26 @@ success.
 
 =cut
 
-sub helo
-{
-    my($self, $hostname) = @_;
+sub helo {
+    my ( $self, $hostname ) = @_;
 
-    unless(defined $hostname && length $hostname)
-    {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    unless ( defined $hostname && length $hostname ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
 
-    $self->make_event
-    (
-        name => 'HELO',
-        arguments => [$hostname],
-        on_success => sub
-        {
+    $self->make_event(
+        name       => 'HELO',
+        arguments  => [$hostname],
+        on_success => sub {
+
             # according to the RFC, HELO ensures "that both the SMTP client
             # and the SMTP server are in the initial state"
             $self->step_reverse_path(1);
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
-        success_reply => [250, 'Requested mail action okay, completed'],
+        success_reply => [ 250, 'Requested mail action okay, completed' ],
     );
 
     return;
@@ -255,10 +242,9 @@ This handler takes no argument
 
 =cut
 
-sub noop
-{
-    my($self) = @_;
-    $self->make_event(name => 'NOOP');
+sub noop {
+    my ($self) = @_;
+    $self->make_event( name => 'NOOP' );
     return;
 }
 
@@ -272,15 +258,13 @@ Handler takes address as argument.
 
 =cut
 
-sub expn
-{
-    my($self, $address) = @_;
-    $self->make_event
-      (
-       name => 'EXPN',
-       arguments => [$address],
-       default_reply => [502, 'Command not implemented']
-      );
+sub expn {
+    my ( $self, $address ) = @_;
+    $self->make_event(
+        name          => 'EXPN',
+        arguments     => [$address],
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -294,16 +278,15 @@ Handler takes no argument.
 
 =cut
 
-sub turn
-{
+sub turn {
+
     # deprecated in RFC 2821
-    my($self) = @_;
-    $self->reply(502, 'Command not implemented');
-    $self->make_event
-      (
-       name => 'TURN',
-       default_reply => [502, 'Command not implemented']
-      );
+    my ($self) = @_;
+    $self->reply( 502, 'Command not implemented' );
+    $self->make_event(
+        name          => 'TURN',
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -317,15 +300,13 @@ Handler takes address as argument.
 
 =cut
 
-sub vrfy
-{
-    my($self, $address) = @_;
-    $self->make_event
-      (
-       name => 'VRFY',
-       arguments => [$address],
-       default_reply => [502, 'Command not implemented']
-      );
+sub vrfy {
+    my ( $self, $address ) = @_;
+    $self->make_event(
+        name          => 'VRFY',
+        arguments     => [$address],
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -339,15 +320,13 @@ Handler takes a command name as argument.
 
 =cut
 
-sub help
-{
-    my($self, $command) = @_;
-    $self->make_event
-      (
-       name => 'HELP',
-       arguments => [$command],
-       default_reply => [502, 'Command not implemented']
-      );
+sub help {
+    my ( $self, $command ) = @_;
+    $self->make_event(
+        name          => 'HELP',
+        arguments     => [$command],
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -361,54 +340,46 @@ get_sender() method).
 
 =cut
 
-sub mail
-{
-    my($self, $args) = @_;
+sub mail {
+    my ( $self, $args ) = @_;
 
-    unless($self->step_reverse_path)
-    {
-        $self->reply(503, 'Bad sequence of commands');
+    unless ( $self->step_reverse_path ) {
+        $self->reply( 503, 'Bad sequence of commands' );
         return;
     }
 
-
-    unless($args =~ s/^from:\s*//i)
-    {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    unless ( $args =~ s/^from:\s*//i ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
 
-    if($self->step_forward_path)
-    {
-        $self->reply(503, 'Bad sequence of commands');
+    if ( $self->step_forward_path ) {
+        $self->reply( 503, 'Bad sequence of commands' );
         return;
     }
 
-    my($address, $rest, @options);
-    unless (($address, $rest) = $args =~ /^<(.*?)>(?: (\S.*))?$/) {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    my ( $address, $rest, @options );
+    unless ( ( $address, $rest ) = $args =~ /^<(.*?)>(?: (\S.*))?$/ ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
     if ($rest) {
         @options = split ' ', $rest;
     }
 
-    unless($self->handle_options('MAIL', $address, @options))
-    {
+    unless ( $self->handle_options( 'MAIL', $address, @options ) ) {
         return;
     }
 
-    $self->make_event
-    (
-        name => 'MAIL',
-        arguments => [$address],
-        on_success => sub
-        {
+    $self->make_event(
+        name       => 'MAIL',
+        arguments  => [$address],
+        on_success => sub {
             $self->step_reverse_path($address);
             $self->step_forward_path(1);
         },
-        success_reply => [250, "sender $address OK"],
-        failure_reply => [550, 'Failure'],
+        success_reply => [ 250, "sender $address OK" ],
+        failure_reply => [ 550, 'Failure' ],
     );
 
     return;
@@ -424,50 +395,44 @@ with get_recipients() method).
 
 =cut
 
-sub rcpt
-{
-    my($self, $args) = @_;
+sub rcpt {
+    my ( $self, $args ) = @_;
 
-    unless($self->step_forward_path)
-    {
-        $self->reply(503, 'Bad sequence of commands');
-        return;
-    }
-    
-    unless($args =~ s/^to:\s*//i)
-    {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    unless ( $self->step_forward_path ) {
+        $self->reply( 503, 'Bad sequence of commands' );
         return;
     }
 
-    my($address, $rest, @options);
-    unless (($address, $rest) = $args =~ /^<(.*?)>(?: (\S.*))?$/) {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    unless ( $args =~ s/^to:\s*//i ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
+        return;
+    }
+
+    my ( $address, $rest, @options );
+    unless ( ( $address, $rest ) = $args =~ /^<(.*?)>(?: (\S.*))?$/ ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
     if ($rest) {
         @options = split ' ', $rest;
     }
 
-    unless($self->handle_options('RCPT', $address, @options))
-    {
+    unless ( $self->handle_options( 'RCPT', $address, @options ) ) {
         return;
     }
 
-    $self->make_event
-    (
-        name => 'RCPT',
-        arguments => [$address],
-        on_success => sub
-        {
+    $self->make_event(
+        name       => 'RCPT',
+        arguments  => [$address],
+        on_success => sub {
             my $buffer = $self->step_forward_path();
             $buffer = [] unless ref $buffer eq 'ARRAY';
-            push(@$buffer, $address);
+            push( @$buffer, $address );
             $self->step_forward_path($buffer);
             $self->step_maildata_path(1);
         },
-        success_reply => [250, "recipient $address OK"],
-        failure_reply => [550, 'Failure'],
+        success_reply => [ 250, "recipient $address OK" ],
+        failure_reply => [ 550, 'Failure' ],
     );
 
     return;
@@ -485,14 +450,12 @@ Handler takes no argument.
 
 # we overwrite a perl command... we shouldn't need it in this class,
 # but take care.
-sub send
-{
-    my($self) = @_;
-    $self->make_event
-      (
-       name => 'SEND',
-       default_reply => [502, 'Command not implemented']
-      );
+sub send {
+    my ($self) = @_;
+    $self->make_event(
+        name          => 'SEND',
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -506,14 +469,12 @@ Handler takes no argument.
 
 =cut
 
-sub soml
-{
-    my($self) = @_;
-    $self->make_event
-      (
-       name => 'SOML',
-       default_reply => [502, 'Command not implemented']
-      );
+sub soml {
+    my ($self) = @_;
+    $self->make_event(
+        name          => 'SOML',
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -527,14 +488,12 @@ Handler takes no argument.
 
 =cut
 
-sub saml
-{
-    my($self) = @_;
-    $self->make_event
-      (
-       name => 'SAML',
-       default_reply => [502, 'Command not implemented']
-      );
+sub saml {
+    my ($self) = @_;
+    $self->make_event(
+        name          => 'SAML',
+        default_reply => [ 502, 'Command not implemented' ]
+    );
     return;
 }
 
@@ -560,29 +519,25 @@ deprecated to change the contents of this scalar.
 
 =cut
 
-sub data
-{
-    my($self, $args) = @_;
+sub data {
+    my ( $self, $args ) = @_;
 
-    unless($self->step_maildata_path)
-    {
-        $self->reply(503, 'Bad sequence of commands');
+    unless ( $self->step_maildata_path ) {
+        $self->reply( 503, 'Bad sequence of commands' );
         return;
     }
 
-    if(defined $args && length $args)
-    {
-        $self->reply(501, 'Syntax error in parameters or arguments');
+    if ( defined $args && length $args ) {
+        $self->reply( 501, 'Syntax error in parameters or arguments' );
         return;
     }
 
     $self->{last_chunk} = '';
-    $self->make_event
-      (
-       name => 'DATA-INIT',
-       on_success => sub {$self->next_input_to(\&data_part);},
-       success_reply => [354, 'Start mail input; end with <CRLF>.<CRLF>']
-      );
+    $self->make_event(
+        name          => 'DATA-INIT',
+        on_success    => sub { $self->next_input_to( \&data_part ); },
+        success_reply => [ 354, 'Start mail input; end with <CRLF>.<CRLF>' ]
+    );
 
     return;
 }
@@ -590,29 +545,29 @@ sub data
 # Because data is cutted into pieces (4096 bytes), we have to search
 # "\r\n.\r\n" sequence in 2 consecutive pieces. $self->{last_chunk}
 # contains the last 5 bytes.
-sub data_part
-{
-    my($self, $data) = @_;
+sub data_part {
+    my ( $self, $data ) = @_;
 
     # search for end of data indicator
     $data ||= '';
-    if("$self->{last_chunk}$data" =~ /\r?\n\.\r?\n/s )
-    {
+    if ( "$self->{last_chunk}$data" =~ /\r?\n\.\r?\n/s ) {
         my $more_data = $';
-        if(length $more_data)
-        {
+        if ( length $more_data ) {
+
             # Client sent a command after the end of data indicator ".".
-            if(!$self->{data_handle_more_data})
-            {
-                $self->reply(453, "Command received prior to completion of".
-                                  " previous command sequence");
+            if ( !$self->{data_handle_more_data} ) {
+                $self->reply( 453,
+                        "Command received prior to completion of"
+                      . " previous command sequence" );
                 return;
             }
         }
-        
+
         # RFC 821 compliance.
-        ($data = "$self->{last_chunk}$data") =~ s/(\r?\n)\.\r?\n(QUIT\r?\n)?$/$1/s;
+        ( $data = "$self->{last_chunk}$data" ) =~
+          s/(\r?\n)\.\r?\n(QUIT\r?\n)?$/$1/s;
         $self->{_data} .= $data;
+
         # RFC 2821 by the letter
         $self->{_data} =~ s/^\.(.+\015\012)(?!\n)/$1/gm;
         return $self->data_finished($more_data);
@@ -620,32 +575,29 @@ sub data_part
 
     my $tmp = $self->{last_chunk};
     $self->{last_chunk} = substr $data, -5;
-    $data = $tmp . ($data ? substr ($data, 0, -5) : '');
-    $self->make_event
-      (
-       name => 'DATA-PART',
-       arguments => [\$data],
-       on_success => sub
-       {
-           $self->{_data} .= $data;
-           # please, recall me soon !
-           $self->next_input_to(\&data_part);
-       },
-       success_reply => '', # don't send any reply !
-      );
+    $data = $tmp . ( $data ? substr( $data, 0, -5 ) : '' );
+    $self->make_event(
+        name       => 'DATA-PART',
+        arguments  => [ \$data ],
+        on_success => sub {
+            $self->{_data} .= $data;
+
+            # please, recall me soon !
+            $self->next_input_to( \&data_part );
+        },
+        success_reply => '',    # don't send any reply !
+    );
 
     return;
 }
 
-sub data_finished
-{
-    my($self, $more_data) = @_;
+sub data_finished {
+    my ( $self, $more_data ) = @_;
 
-    $self->make_event
-    (
-        name => 'DATA',
-        arguments => [\$self->{_data}],
-        success_reply => [250, 'message sent'],
+    $self->make_event(
+        name          => 'DATA',
+        arguments     => [ \$self->{_data} ],
+        success_reply => [ 250, 'message sent' ],
     );
 
     # reinitiate the connection
@@ -654,12 +606,10 @@ sub data_finished
     $self->step_maildata_path(0);
 
     # if more data, handle it
-    if($more_data)
-    {
-        return $self->{process_operation}($self, $more_data);
+    if ($more_data) {
+        return $self->{process_operation}( $self, $more_data );
     }
-    else
-    {
+    else {
         return;
     }
 }
@@ -675,21 +625,18 @@ flushed.
 
 =cut
 
-sub rset
-{
-    my($self) = @_;
+sub rset {
+    my ($self) = @_;
 
-    $self->make_event
-    (
-        name => 'RSET',
-        on_success => sub
-        {
+    $self->make_event(
+        name       => 'RSET',
+        on_success => sub {
             $self->step_reverse_path(1)
-              if($self->step_reverse_path());
+              if ( $self->step_reverse_path() );
             $self->step_forward_path(0);
             $self->step_maildata_path(0);
         },
-        success_reply => [250, 'Requested mail action okay, completed'],
+        success_reply => [ 250, 'Requested mail action okay, completed' ],
     );
 
     return;
@@ -707,29 +654,28 @@ connection.
 
 =cut
 
-sub quit
-{
-    my($self) = @_;
+sub quit {
+    my ($self) = @_;
 
-    $self->make_event
-    (
-        name => 'QUIT',
-        success_reply => [221, $self->get_hostname . ' Service closing transmission channel'],
+    $self->make_event(
+        name          => 'QUIT',
+        success_reply => [
+            221, $self->get_hostname . ' Service closing transmission channel'
+        ],
     );
 
-    return 1; # close cnx
+    return 1;    # close cnx
 }
 
 ##########################################################################
 
-sub handle_options
-{
-    # handle options for verb MAIL and RCPT
-    my($self, $verb, $address, @options) = @_;
+sub handle_options {
 
-    if(@options)
-    {
-        $self->reply(555, "Unsupported option: $options[0]");
+    # handle options for verb MAIL and RCPT
+    my ( $self, $verb, $address, @options ) = @_;
+
+    if (@options) {
+        $self->reply( 555, "Unsupported option: $options[0]" );
         return 0;
     }
 

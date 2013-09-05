@@ -15,12 +15,11 @@ Net::Server::Mail::ESMTP::Extension - The base class for ESMTP extension system
 
 =cut
 
-sub new
-{
-    my($proto, $parent) = @_;
-    my $class  = ref $proto || $proto;
-    my $self   = {};
-    bless($self, $class);
+sub new {
+    my ( $proto, $parent ) = @_;
+    my $class = ref $proto || $proto;
+    my $self = {};
+    bless( $self, $class );
     return $self->init($parent);
 }
 
@@ -35,9 +34,8 @@ initialisation. The method takes the $smtp object as parameter.
 
 =cut
 
-sub init
-{
-    my($self, $parent) = @_;
+sub init {
+    my ( $self, $parent ) = @_;
     return $self;
 }
 
@@ -47,8 +45,7 @@ sub init
 
 =cut
 
-sub verb
-{
+sub verb {
     return ();
 }
 
@@ -58,8 +55,7 @@ sub verb
 
 =cut
 
-sub keyword
-{
+sub keyword {
     return 'XNOTOVERLOADED';
 }
 
@@ -69,8 +65,7 @@ sub keyword
 
 =cut
 
-sub parameter
-{
+sub parameter {
     return ();
 }
 
@@ -80,8 +75,7 @@ sub parameter
 
 =cut
 
-sub option
-{
+sub option {
     return ();
 }
 
@@ -91,8 +85,7 @@ sub option
 
 =cut
 
-sub reply
-{
+sub reply {
     return ();
 }
 

@@ -10,7 +10,6 @@ package Net::Server::Mail::ESMTP::STARTTLS;
 use 5.006;
 use strict;
 use warnings;
-use Carp;
 
 # IO::Socket::SSL v1.831 fixed a readline() behavioural deviation in
 # list context on nonblocking sockets, which caused Net::Server::Mail
@@ -20,7 +19,7 @@ use IO::Socket::SSL 1.831;
 use Net::Server::Mail::ESMTP::Extension;
 our @ISA = qw(Net::Server::Mail::ESMTP::Extension);
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
 
 use constant {
     REPLY_READY_TO_START => 220,
