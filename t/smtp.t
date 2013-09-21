@@ -1,12 +1,10 @@
 use strict;
-use Test;
+use Test::More;
 use IO::Socket;
 use Net::SMTP;
 
-BEGIN { plan tests => 10; }
-
-use Net::Server::Mail::SMTP;
-ok(1);
+plan tests => 10;
+use_ok('Net::Server::Mail::SMTP');
 
 my $server_port = 2525;
 my $server;
