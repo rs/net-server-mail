@@ -1,6 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.22
 	- Use Test::More in tests
+	- Many spelling mistakes corrected by David Steinbrunner
+	  (thanks a lot!)
 
 0.21  Thu Sep 5 12:52:56 2013
 	- use weak references to point to parent object in XFORWARD and

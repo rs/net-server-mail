@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use base qw(Net::Server::Mail::SMTP);
 
-our $VERSION = "0.16";
+our $VERSION = "0.22";
 
 =pod
 

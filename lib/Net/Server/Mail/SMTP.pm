@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base 'Net::Server::Mail';
 
-our $VERSION = "0.18";
+our $VERSION = "0.22";
 
 =pod
 
