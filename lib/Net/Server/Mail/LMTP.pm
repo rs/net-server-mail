@@ -10,7 +10,7 @@ our $VERSION = "0.16";
 
 =head1 NAME
 
-Net::Server::Mail::LMTP - A module to implement the LMTP protocole
+Net::Server::Mail::LMTP - A module to implement the LMTP protocol
   
 
 =head1 SYNOPSIS

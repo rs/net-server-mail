@@ -11,7 +11,7 @@ our $VERSION = "0.16";
 
 =head1 NAME
 
-Net::Server::Mail::ESMTP - A module to implement the ESMTP protocole
+Net::Server::Mail::ESMTP - A module to implement the ESMTP protocol
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,7 @@ argument and specific callback's arguments.
 =head2 EHLO
 
 Takes the hostname given as argument. Engage the reverse path step on
-success. RFC 2821 require thats EHLO command return the list of
+success. RFC 2821 requires that EHLO command return the list of
 supported extension. Default success reply implement this, so it is
 deprecated to override this reply.
 
