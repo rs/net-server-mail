@@ -191,12 +191,11 @@ sub init {
 
 =head2 dojob
 
-Some command need to do some job after the handler call. Handler may
-want to override this compartment to prevent from this job being
-executed.
+Some commands need to do a job after the handler call. The handler
+may want to override this to prevent the job from being executed.
 
-By calling this method with a (defined) false value as argument,
-expected job isn't executed. Defaults to true.
+By calling this method with a (defined) false value as an argument,
+the expected job isn't executed. Defaults to true.
 
 =cut
 
