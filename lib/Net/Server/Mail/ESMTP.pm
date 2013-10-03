@@ -11,7 +11,7 @@ our $VERSION = "0.16";
 
 =head1 NAME
 
-Net::Server::Mail::ESMTP - A module to implement the ESMTP protocole
+Net::Server::Mail::ESMTP - A module to implement the ESMTP protocol
 
 =head1 SYNOPSIS
 
