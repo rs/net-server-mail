@@ -10,7 +10,7 @@ our $VERSION = "0.18";
 
 =head1 NAME
 
-Net::Server::Mail::SMTP - A module to implement the SMTP protocole
+Net::Server::Mail::SMTP - A module to implement the SMTP protocol
 
 =head1 SYNOPSIS
 
@@ -542,7 +542,7 @@ sub data {
     return;
 }
 
-# Because data is cutted into pieces (4096 bytes), we have to search
+# Because data is cut into pieces (4096 bytes), we have to search
 # "\r\n.\r\n" sequence in 2 consecutive pieces. $self->{last_chunk}
 # contains the last 5 bytes.
 sub data_part {
