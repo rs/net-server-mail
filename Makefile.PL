@@ -17,8 +17,8 @@ WriteMakefile(
         : ()
     ),
     META_MERGE => {
-        recommends => {
-            'IO::Socket::SSL' => 1.831,
+        resources => {
+            repository => 'https://github.com/rs/net-server-mail',
         },
     },
 );
