@@ -89,7 +89,7 @@ ESMTP extensions. Developers can hook code at each SMTP session state
 and change the module's behaviors by registering event call-backs. The
 class is designed to be easily inherited from.
 
-This class is the base class for mail service protocols such axs
+This class is the base class for mail service protocols such as
 B<Net::Server::Mail::SMTP>, B<Net::Server::Mail::ESMTP> and
 B<Net::Server::Mail::LMTP>. Refer to the documentation provided with
 each of these modules.
@@ -191,12 +191,11 @@ sub init {
 
 =head2 dojob
 
-Some command need to do some job after the handler call. Handler may
-want to overide this comportement to prevent from this job being
-executed.
+Some commands need to do a job after the handler call. The handler
+may want to override this to prevent the job from being executed.
 
-By calling this method with a (defined) false value as argument,
-expected job isn't executed. Defaults to true.
+By calling this method with a (defined) false value as an argument,
+the expected job isn't executed. Defaults to true.
 
 =cut
 
@@ -645,7 +644,7 @@ sub banner {
 
 =head2 timeout
 
-This event append where timeout is exeded.
+This event append where timeout is exceeded.
 
 Handler takes no argument.
 

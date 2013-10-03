@@ -141,7 +141,7 @@ Please, see L<Net::Server::Mail>
 
 =head1 AUTHOR
 
-This module has been writed by Xavier Guimard <x.guimard@free.fr> using libs
+This module has been written by Xavier Guimard <x.guimard@free.fr> using libs
 written by:
 
 =over
