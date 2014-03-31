@@ -157,7 +157,7 @@ first argument followed by the current recipient.
 =cut
 
 sub data_finished {
-    my ($self) = @_;
+    my ( $self, $more_data ) = @_;
 
     my $recipients = $self->step_forward_path();
 
@@ -175,7 +175,13 @@ sub data_finished {
     $self->step_forward_path(0);
     $self->step_maildata_path(0);
 
-    return;
+    # if more data, handle it
+    if ($more_data) {
+        return $self->{process_operation}( $self, $more_data );
+    }
+    else {
+        return;
+    }
 }
 
 =pod
