@@ -256,7 +256,8 @@ sub make_event {
     }
 
     # ensure that a reply is sent, all SMTP command need at most 1 reply.
-    unless ( defined $code ) {
+    # some events such as 'stop_session' don't require sending reply.
+    unless ( defined $code && !$args{'no_reply'} ) {
         if ( defined $success && $success ) {
             ( $code, $msg ) =
               $self->get_default_reply( $args{'success_reply'}, 250 );
@@ -267,7 +268,7 @@ sub make_event {
         }
     }
 
-    die "return code `$code' isn't numeric" if ( $code =~ /\D/ );
+    die "return code `$code' isn't numeric" if ( defined $code && $code =~ /\D/ );
 
     $self->handle_reply( $name, $success, $code, $msg )
       if defined $code and length $code;
@@ -454,10 +455,15 @@ sub process {
                 $rv = sysread( $in, $buffer, 512 * 1024, length($buffer) );
             }
         }
+	else {
+	    # timeout
+	    return $self->timeout;
+	}
+
         if ( ( not defined $rv ) or ( $rv == 0 ) ) {
 
-            # timeout, read error or connection closed
-            last;
+            # read error or connection closed
+            return $self->stop_session((not defined $rv) ? ($!) : ());
         }
 
         # process all terminated lines
@@ -497,7 +503,7 @@ sub process {
         }
     }
 
-    $self->timeout;
+    return 1;
 }
 
 sub process_once {
@@ -660,6 +666,45 @@ sub timeout {
             $self->get_hostname
               . ' Timeout exceeded, closing transmission channel'
         ],
+    );
+
+    return 1;
+}
+
+=pod
+
+=head2 timeout
+
+This event append where connection is closed or an error occurs during reading from socket.
+
+Takes the error description as an argument if an error occured and the argument is undefined if the session was closed by peer.
+
+    $mailserver->set_callback
+    (
+        'stop_session', sub
+        {
+            my($session, $err) = @_;
+            if( defined $err )
+            {
+                print "Error occured during processing: $err\n";
+            }
+            else
+            {
+                print "Session closed py peer\n";
+            }
+            return 1;
+        }
+    );
+
+=cut
+
+sub stop_session {
+    my ($self, $err) = @_;
+
+    $self->make_event(
+        name          => 'stop_session',
+	arguments     => [$err],
+	no_reply      => 1,
     );
 
     return 1;
