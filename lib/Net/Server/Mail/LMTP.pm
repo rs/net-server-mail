@@ -156,6 +156,17 @@ first argument followed by the current recipient.
 
 =cut
 
+sub data {
+    my ( $self, $args ) = @_;
+
+    unless ( ref $self->step_forward_path eq 'ARRAY'
+        and @{ $self->step_forward_path } ) {
+        $self->reply( 503, 'Bad sequence of commands' );
+        return;
+    }
+    $self->SUPER::data( $args );
+}
+
 sub data_finished {
     my ( $self, $more_data ) = @_;
 
