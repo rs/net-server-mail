@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use base qw(Net::Server::Mail::ESMTP::Extension);
 

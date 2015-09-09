@@ -1,9 +1,10 @@
 Revision history for Perl extension Net::Server::Mail.
 
-0.22
+0.22  Wed Sep 9 13:41:23 2015
 	- Use Test::More in tests
 	- Many spelling mistakes corrected by David Steinbrunner
-	  (thanks a lot!)
+	- Fix "LMTP server processes DATA callback multiple times"
+	  (thanks to Hatuka Nezumi). Closes: RT#106949
 
 0.21  Thu Sep 5 12:52:56 2013
 	- use weak references to point to parent object in XFORWARD and
