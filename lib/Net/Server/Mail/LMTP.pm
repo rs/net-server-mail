@@ -160,19 +160,22 @@ sub data {
     my ( $self, $args ) = @_;
 
     unless ( ref $self->step_forward_path eq 'ARRAY'
-        and @{ $self->step_forward_path } ) {
+        and @{ $self->step_forward_path } )
+    {
         $self->reply( 503, 'Bad sequence of commands' );
         return;
     }
-    $self->SUPER::data( $args );
+    $self->SUPER::data($args);
 }
 
 sub data_finished {
     my ( $self, $more_data ) = @_;
 
-    my $recipients = $self->step_forward_path();
+    my @recipients = @{ $self->step_forward_path || [] };
 
-    foreach my $forward_path (@$recipients) {
+    $self->{continuous_reply} = 1;
+    while ( my $forward_path = shift @recipients ) {
+        $self->{continuous_reply} = 0 unless @recipients;
         $self->make_event(
             name          => 'DATA',
             arguments     => [ \$self->{_data}, $forward_path ],
@@ -180,6 +183,7 @@ sub data_finished {
             failure_reply => [ 550, "$forward_path Failed" ],
         );
     }
+    $self->{continuous_reply} = 0;
 
     # reinitiate the connection
     $self->step_reverse_path(1);
@@ -192,6 +196,18 @@ sub data_finished {
     }
     else {
         return;
+    }
+}
+
+sub reply {
+    my ( $self, $code, $msg ) = @_;
+
+    if ( not ref $msg and $self->{continuous_reply} ) {
+        my $out = $self->{out};
+        print $out "$code-$msg\r\n";
+    }
+    else {
+        $self->SUPER::reply( $code, $msg );
     }
 }
 
