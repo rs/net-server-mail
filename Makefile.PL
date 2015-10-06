@@ -19,6 +19,7 @@ WriteMakefile(
           )
         : ()
     ),
+    LICENSE => 'lgpl',
     MIN_PERL_VERSION => '5.008',
     META_MERGE => {
         resources => {
