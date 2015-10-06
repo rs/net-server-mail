@@ -1,5 +1,8 @@
 use ExtUtils::MakeMaker;
 
+use strict;
+use warnings;
+
 WriteMakefile(
     'NAME'         => 'Net::Server::Mail',
     'VERSION_FROM' => 'lib/Net/Server/Mail.pm',
@@ -16,6 +19,8 @@ WriteMakefile(
           )
         : ()
     ),
+    LICENSE => 'lgpl',
+    MIN_PERL_VERSION => '5.008',
     META_MERGE => {
         resources => {
             repository => 'https://github.com/rs/net-server-mail',
