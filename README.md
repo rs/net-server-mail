@@ -1,5 +1,5 @@
-Net::Server::Mail version 0.15
-==============================
+Net::Server::Mail
+=================
 
 This module is a versatile and extensible implementation of the SMTP
 protocol and its different evolutions like ESMTP and LMTP. The event
