@@ -1,5 +1,8 @@
 use ExtUtils::MakeMaker;
 
+use strict;
+use warnings;
+
 WriteMakefile(
     'NAME'         => 'Net::Server::Mail',
     'VERSION_FROM' => 'lib/Net/Server/Mail.pm',
