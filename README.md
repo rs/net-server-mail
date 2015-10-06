@@ -16,22 +16,25 @@ ESMTP extensions. Developers can hook code at each SMTP session state
 and change the module's behaviors by registering event call-backs. The
 class is designed to be easily inherited from.
 
-INSTALLATION
+Installation
+------------
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-DEPENDENCIES
+Dependencies
+------------
 
 This module requires these other modules and libraries:
 
 Sys::Hostname IO::Select and Carp all available on CPAN.
 
-LICENCE
+Licence
+-------
 
 This library is  free software; you can redistribute  it and/or modify
 it  under  the terms  of  the GNU  Lesser  General  Public License  as
@@ -48,18 +51,19 @@ License along  with this library; if  not, write to  the Free Software
 Foundation, Inc.,  59 Temple Place,  Suite 330, Boston,  MA 02111-1307
 USA
 
-COPYRIGHT
+Copyright
+---------
 
- * Copyright (C) 2002 - Olivier Poitrey
- * Copyright (C) 2007-2013 - Xavier Guimard
+* Copyright (C) 2002 - Olivier Poitrey
+* Copyright (C) 2007-2015 - Xavier Guimard <x.guimard@free.fr>
 
- STARTTLS
+STARTTLS
 
- * Copyright (C) 2009 - Dan Moore
- * Copyright (C) 2013 - Mytram <rmytram@gmail.com>
- * Copyright (C) 2013 - Xavier Guimard <x.guimard@free.fr>
+* Copyright (C) 2009 - Dan Moore
+* Copyright (C) 2013 - Mytram <rmytram@gmail.com>
+* Copyright (C) 2013 - Xavier Guimard <x.guimard@free.fr>
 
- Contributors
+Contributors
 
  * Georg Hoesch (patch to reduce memory consumption)
 
