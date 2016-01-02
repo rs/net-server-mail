@@ -114,7 +114,7 @@ Net::Server::Mail::ESMTP::STARTTLS - A module to support the STARTTLS command in
        # adding optional STARTTLS handler
        $esmtp->set_callback(STARTTLS => \&tls_started);
        $esmtp->process();
-       $conn->close()
+       $conn->close();
    }
    
    sub tls_started {

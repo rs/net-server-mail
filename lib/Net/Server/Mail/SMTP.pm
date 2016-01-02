@@ -26,7 +26,7 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocol
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();
-        $conn->close()
+        $conn->close();
     }
 
     sub validate_recipient

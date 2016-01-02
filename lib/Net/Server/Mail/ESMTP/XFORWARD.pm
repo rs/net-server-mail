@@ -125,7 +125,7 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
         # adding XFORWARD handler
         $esmtp->set_callback(XFORWARD => \&xforward);
         $esmtp->process();
-	$conn->close()
+        $conn->close();
     }
     
     sub xforward {
