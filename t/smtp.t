@@ -10,7 +10,7 @@ my $server_port = 2525;
 my $server;
 
 while ( not defined $server && $server_port < 4000 ) {
-    $server = new IO::Socket::INET(
+    $server = IO::Socket::INET->new(
         Listen    => 1,
         LocalPort => ++$server_port,
     );
@@ -19,15 +19,15 @@ while ( not defined $server && $server_port < 4000 ) {
 my $pid = fork;
 if ( !$pid ) {
     while ( my $conn = $server->accept ) {
-        my $m = new Net::Server::Mail::SMTP
+        my $m = Net::Server::Mail::SMTP->new(
           socket       => $conn,
           idle_timeout => 5
-          or die "can't start server on port 2525";
+        ) or die "can't start server on port 2525";
         $m->process;
     }
 }
 
-my $smtp = new Net::SMTP "localhost:$server_port", Debug => 0;
+my $smtp = Net::SMTP->new( "localhost:$server_port", Debug => 0 );
 ok( defined $smtp );
 
 ok( $smtp->mail("test\@bla.com") );

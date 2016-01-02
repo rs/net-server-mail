@@ -17,12 +17,12 @@ Net::Server::Mail::SMTP - A module to implement the SMTP protocol
     use Net::Server::Mail::SMTP;
 
     my @local_domains = qw(example.com example.org);
-    my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+    my $server = IO::Socket::INET->new( Listen => 1, LocalPort => 25 );
 
     my $conn;
     while($conn = $server->accept)
     {
-        my $smtp = new Net::Server::Mail::SMTP socket => $conn;
+        my $smtp = Net::Server::Mail::SMTP->new( socket => $conn );
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();

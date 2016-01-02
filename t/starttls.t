@@ -274,7 +274,7 @@ sub process_test {
 
     my $client = $sock->accept;
     push @socks, $client;
-    my $smtp = new Net::Server::Mail::ESMTP(
+    my $smtp = Net::Server::Mail::ESMTP->new(
         socket       => $client,
         idle_timeout => 300,
         SSL_config   => {

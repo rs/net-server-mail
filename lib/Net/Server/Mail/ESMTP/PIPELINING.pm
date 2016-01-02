@@ -2,6 +2,7 @@ package Net::Server::Mail::ESMTP::PIPELINING;
 
 use 5.006;
 use strict;
+use warnings;
 use base 'Net::Server::Mail::ESMTP::Extension';
 use constant GROUP_COMMANDS => [qw(RSET MAIL SEND SOML SAML RCPT)];
 use Scalar::Util qw(weaken);

@@ -94,12 +94,12 @@ Net::Server::Mail::ESMTP::STARTTLS - A module to support the STARTTLS command in
    use Net::Server::Mail::ESMTP;
 
    my @local_domains = qw(example.com example.org);
-   my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+   my $server = IO::Socket::INET->new( Listen => 1, LocalPort => 25 );
 
    my $conn;
    while($conn = $server->accept)
    {
-       my $esmtp = new Net::Server::Mail::ESMTP(
+       my $esmtp = Net::Server::Mail::ESMTP->new(
             socket => $conn,
             SSL_config => {
                 SSL_cert_file => 'your_cert.pem',

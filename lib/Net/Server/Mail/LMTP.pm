@@ -18,12 +18,12 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocol
     use Net::Server::Mail::LMTP;
 
     my @local_domains = qw(example.com example.org);
-    my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+    my $server = IO::Socket::INET->new( Listen => 1, LocalPort => 25 );
 
     my $conn;
     while($conn = $server->accept)
     {
-        my $esmtp = new Net::Server::Mail::LMTP socket => $conn;
+        my $esmtp = Net::Server::Mail::LMTP->new( socket => $conn );
         # adding some handlers
         $esmtp->set_callback(RCPT => \&validate_recipient);
         $esmtp->set_callback(DATA => \&queue_message);

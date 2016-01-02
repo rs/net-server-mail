@@ -2,6 +2,7 @@ package Net::Server::Mail::ESMTP::8BITMIME;
 
 use 5.006;
 use strict;
+use warnings;
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
 our $VERSION = "0.14";

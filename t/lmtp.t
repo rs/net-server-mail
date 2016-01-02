@@ -17,7 +17,7 @@ SKIP: {
     my $server;
 
     while ( not defined $server && $server_port < 4000 ) {
-        $server = new IO::Socket::INET(
+        $server = IO::Socket::INET->new(
             Listen    => 1,
             LocalPort => ++$server_port,
         );
@@ -26,10 +26,10 @@ SKIP: {
     my $pid = fork;
     if ( !$pid ) {
         while ( my $conn = $server->accept ) {
-            my $m = new Net::Server::Mail::LMTP
+            my $m = Net::Server::Mail::LMTP->new(
               socket       => $conn,
               idle_timeout => 5
-              or die "can't start server on port 2525";
+            ) or die "can't start server on port 2525";
             $m->set_callback( 'DATA', sub { return $_[1] !~ /bad/ } );
             $m->process;
         }
@@ -38,7 +38,7 @@ SKIP: {
         }
     }
 
-    my $lmtp = new Net::LMTP 'localhost', $server_port, Debug => 0;
+    my $lmtp = Net::LMTP->new( 'localhost', $server_port, Debug => 0 );
     ok( defined $lmtp );
 
     ok( $lmtp->mail("test\@bla.com") );
