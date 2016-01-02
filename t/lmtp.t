@@ -2,7 +2,7 @@ use strict;
 use Test::More;
 use IO::Socket;
 
-plan tests => 11;
+plan tests => 10;
 
 eval('use Net::LMTP');
 SKIP: {
@@ -48,7 +48,6 @@ SKIP: {
     ok( $lmtp->data );
     ok( $lmtp->datasend('To: postmaster') );
     ok( $lmtp->dataend );
-    ok( $lmtp->response );
     ok( $lmtp->quit );
 
     kill 1, $pid;
