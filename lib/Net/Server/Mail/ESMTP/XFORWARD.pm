@@ -109,12 +109,12 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
     use Net::Server::Mail::ESMTP;
     
     my @local_domains = qw(example.com example.org);
-    my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+    my $server = IO::Socket::INET->new( Listen => 1, LocalPort => 25 );
     
     my $conn;
     while($conn = $server->accept)
     {
-        my $esmtp = new Net::Server::Mail::ESMTP socket => $conn;
+        my $esmtp = Net::Server::Mail::ESMTP->new( socket => $conn );
         
         # activate XFORWARD extension if remote client is localhost
         $esmtp->register('Net::Server::Mail::ESMTP::XFORWARD')

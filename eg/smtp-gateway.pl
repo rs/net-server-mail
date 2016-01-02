@@ -33,13 +33,12 @@ unless($opts{d})
 }
 
 # start to listen
-my $server = new IO::Socket::INET
-(
+my $server = IO::Socket::INET->new(
     Listen      => 1,
     LocalPort   => $opts{p},
     LocalHost   => $opts{h},
 ) or die "can't listen $opts{h}:$opts{p}";
-my $select = new IO::Select $server;
+my $select = IO::Select->new($server);
 
 my(@ready, $fh, %session_pool);
 while(@ready = $select->can_read)
@@ -50,12 +49,12 @@ while(@ready = $select->can_read)
         {
             my $new = $server->accept();
             $new->blocking(0);
-            my $smtpout = new Net::SMTP $remote, Debug => $opts{d} or do
+            my $smtpout = Net::SMTP->new( $remote, Debug => $opts{d} ) or do
             {
                 $new->print("Service unavailable\n");
                 $new->close();
             };
-            my $smtpin = new Net::Server::Mail::ESMTP socket => $new
+            my $smtpin = Net::Server::Mail::ESMTP->new( socket => $new )
               or die "can't start server on port $opts{p}";
             $smtpin->register('Net::Server::Mail::ESMTP::PIPELINING');
             $smtpin->register('Net::Server::Mail::ESMTP::8BITMIME');

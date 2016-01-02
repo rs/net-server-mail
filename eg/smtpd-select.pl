@@ -23,13 +23,12 @@ fork and exit;
 setsid;
 
 # start to listen
-my $server = new IO::Socket::INET
-(
+my $server = IO::Socket::INET->new(
     Listen      => 1,
     LocalPort   => $opts{p},
     LocalHost   => $opts{h},
 ) or die "can't listen $opts{h}:$opts{p}";
-my $select = new IO::Select $server;
+my $select = IO::Select->new($server);
 
 my(@ready, $fh, %session_pool);
 while(@ready = $select->can_read)
@@ -41,7 +40,7 @@ while(@ready = $select->can_read)
             my $new = $server->accept();
             $select->add($new);
             $new->blocking(0);
-            my $smtp = new Net::Server::Mail::ESMTP socket => $new
+            my $smtp = Net::Server::Mail::ESMTP->new( socket => $new )
               or die "can't start server on port $opts{p}";
             $smtp->register('Net::Server::Mail::ESMTP::PIPELINING');
             $smtp->register('Net::Server::Mail::ESMTP::8BITMIME');

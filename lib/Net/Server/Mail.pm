@@ -22,12 +22,12 @@ Net::Server::Mail - Class to easily create a mail server
     use Net::Server::Mail::SMTP;
 
     my @local_domains = qw(example.com example.org);
-    my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+    my $server = IO::Socket::INET->new( Listen => 1, LocalPort => 25 );
     
     my $conn;
     while($conn = $server->accept)
     {
-        my $smtp = new Net::Server::Mail::SMTP socket => $conn;
+        my $smtp = Net::Server::Mail::SMTP->new( socket => $conn );
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();
@@ -98,7 +98,7 @@ each of these modules.
 
 =head2 new
 
-    $instance = new Net::Server::Mail [option => 'value', ...]
+    $instance = Net::Server::Mail->new( [option => 'value', ...] )
 
 options:
 
@@ -418,7 +418,7 @@ sub process {
     my ($self) = @_;
 
     my $in  = $self->{in};
-    my $sel = new IO::Select;
+    my $sel = IO::Select->new;
     $sel->add($in);
 
     $self->banner;
