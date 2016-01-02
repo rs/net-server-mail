@@ -28,7 +28,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocol
         $esmtp->set_callback(RCPT => \&validate_recipient);
         $esmtp->set_callback(DATA => \&queue_message);
         $esmtp->process();
-	$conn->close()
+        $conn->close();
     }
 
     sub validate_recipient

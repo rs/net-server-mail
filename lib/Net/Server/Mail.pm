@@ -31,7 +31,7 @@ Net::Server::Mail - Class to easily create a mail server
         $smtp->set_callback(RCPT => \&validate_recipient);
         $smtp->set_callback(DATA => \&queue_message);
         $smtp->process();
-	$conn->close();
+        $conn->close();
     }
 
     sub validate_recipient
@@ -455,10 +455,10 @@ sub process {
                 $rv = sysread( $in, $buffer, 512 * 1024, length($buffer) );
             }
         }
-	else {
-	    # timeout
-	    return $self->timeout;
-	}
+        else {
+            # timeout
+            return $self->timeout;
+        }
 
         if ( ( not defined $rv ) or ( $rv == 0 ) ) {
 
@@ -703,8 +703,8 @@ sub stop_session {
 
     $self->make_event(
         name          => 'stop_session',
-	arguments     => [$err],
-	no_reply      => 1,
+        arguments     => [$err],
+        no_reply      => 1,
     );
 
     return 1;
