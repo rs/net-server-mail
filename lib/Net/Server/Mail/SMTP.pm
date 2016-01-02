@@ -728,11 +728,7 @@ USA
 
 =head1 COPYRIGHT
 
-<<<<<<< HEAD:lib/Net/Server/Mail/SMTP.pm
-Copyright (C) 2002 - Olivier Poitrey
-=======
 Copyright (C) 2002 - Olivier Poitrey, 2007 - Xavier Guimard
->>>>>>> new/master:lib/Net/Server/Mail/SMTP.pm
 
 =cut
 
