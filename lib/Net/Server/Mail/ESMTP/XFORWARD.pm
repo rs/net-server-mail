@@ -2,6 +2,7 @@ package Net::Server::Mail::ESMTP::XFORWARD;
 
 use 5.006;
 use strict;
+use warnings;
 use Scalar::Util qw(weaken);
 
 our $VERSION = '0.22';

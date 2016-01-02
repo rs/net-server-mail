@@ -2,6 +2,7 @@ package Net::Server::Mail::ESMTP;
 
 use 5.006;
 use strict;
+use warnings;
 use Carp;
 use base qw(Net::Server::Mail::SMTP);
 

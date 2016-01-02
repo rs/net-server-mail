@@ -2,6 +2,7 @@ package Net::Server::Mail;
 
 use 5.006;
 use strict;
+use warnings;
 use Sys::Hostname;
 use IO::Select;
 use IO::Handle;
