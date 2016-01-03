@@ -1,8 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
-0.23  Unknowwn
-    - Add a LICENSE file (same as COPYING).
-        - CPANTS Kwalitee.
+0.23
+	- Add a LICENSE file (same as COPYING).
+	- CPANTS Kwalitee.
+	- Fix a bug in LMTP tests (thanks to Sawyer X)
 
 0.22  Wed Sep 9 13:41:23 2015
 	- Use Test::More in tests
