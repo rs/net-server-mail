@@ -5,7 +5,7 @@ Source: https://metacpan.org/release/Net-Server-Mail
 
 Files: *
 Copyright: 2002, Olivier Poitrey
- 2007-2013, Xavier Guimard <x.guimard@free.fr>
+ 2007-2016, Xavier Guimard <x.guimard@free.fr>
 License: LGPL-2.1+
 
 Files: lib/Net/Server/Mail/ESMTP/STARTTLS.pm t/starttls.t

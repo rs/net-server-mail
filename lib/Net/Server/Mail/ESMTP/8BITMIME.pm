@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw(Net::Server::Mail::ESMTP::Extension);
 
-our $VERSION = "0.14";
+our $VERSION = "0.23";
 
 sub keyword {
     return '8BITMIME';

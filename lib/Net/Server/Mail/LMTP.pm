@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use base qw(Net::Server::Mail::ESMTP);
 
-our $VERSION = "0.22";
+our $VERSION = "0.23";
 
 =pod
 
