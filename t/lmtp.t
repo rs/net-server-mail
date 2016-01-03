@@ -8,7 +8,7 @@ eval('use Net::LMTP');
 SKIP: {
 
     if ($@) {
-        skip( "You don't seem to have Net::LMTP installed on your system", 11 );
+        skip( "You don't seem to have Net::LMTP installed on your system", 10 );
     }
     else{
     use_ok('Net::Server::Mail::LMTP');
