@@ -678,7 +678,7 @@ sub timeout {
 
 This event append where connection is closed or an error occurs during reading from socket.
 
-Takes the error description as an argument if an error occured and the argument is undefined if the session was closed by peer.
+Takes the error description as an argument if an error occurred and the argument is undefined if the session was closed by peer.
 
     $mailserver->set_callback
     (
@@ -687,7 +687,7 @@ Takes the error description as an argument if an error occured and the argument 
             my($session, $err) = @_;
             if( defined $err )
             {
-                print "Error occured during processing: $err\n";
+                print "Error occurred during processing: $err\n";
             }
             else
             {
