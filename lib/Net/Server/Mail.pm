@@ -7,6 +7,7 @@ use Sys::Hostname;
 use IO::Select;
 use IO::Handle;
 use Carp;
+use Errno;
 
 use constant HOSTNAME => hostname();
 
@@ -462,6 +463,9 @@ sub process {
         }
 
         if ( ( not defined $rv ) or ( $rv == 0 ) ) {
+
+            # No data available at the moment
+            next if not defined $rv and $!{'EAGAIN'};
 
             # read error or connection closed
             return $self->stop_session((not defined $rv) ? ($!) : ());
