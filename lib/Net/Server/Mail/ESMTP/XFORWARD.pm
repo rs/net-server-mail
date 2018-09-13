@@ -139,7 +139,7 @@ Net::Server::Mail::ESMTP::XFORWARD - A module to add support to the XFORWARD com
     {
         my($session, $recipient) = @_;
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }

@@ -40,7 +40,7 @@ Net::Server::Mail - Class to easily create a mail server
         my($session, $recipient) = @_;
         
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }

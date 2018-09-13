@@ -36,7 +36,7 @@ Net::Server::Mail::LMTP - A module to implement the LMTP protocol
         my($session, $recipient) = @_;
 
         my $domain;
-        if($recipient =~ /@(.*)>\s*$/)
+        if($recipient =~ /\@(.*)>\s*$/)
         {
             $domain = $1;
         }
