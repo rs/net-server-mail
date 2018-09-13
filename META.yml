@@ -23,5 +23,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/rs/net-server-mail
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

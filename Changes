@@ -1,8 +1,12 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.25  Thu Sep 13 22:35:23 2018
+	- Clean RT#127081
+
 0.24  Thu Sep 13 16:46:24 2018
 	- Don't close socket on undef. Closes: RT#127081
 	- Fix example regex. Closes: RT#122468
+	- Fix error in example (closes: RT#122454)
 
 0.23  Sun Jan 3 12:29:30 2016
 	- Add a LICENSE file (same as COPYING).

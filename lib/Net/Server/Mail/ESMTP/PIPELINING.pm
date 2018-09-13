@@ -7,7 +7,7 @@ use base 'Net::Server::Mail::ESMTP::Extension';
 use constant GROUP_COMMANDS => [qw(RSET MAIL SEND SOML SAML RCPT)];
 use Scalar::Util qw(weaken);
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 sub init {
     my ( $self, $parent ) = @_;
