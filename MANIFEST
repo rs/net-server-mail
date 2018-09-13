@@ -23,3 +23,4 @@ t/lmtp.t
 t/smtp.t
 t/starttls.t
 TODO
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,25 +1,27 @@
---- #YAML:1.0
-name:               Net-Server-Mail
-version:            0.20
-abstract:           Class to easily create a mail server
+---
+abstract: 'Class to easily create a mail server'
 author:
-    - Xavier Guimard <x.guimard@free.fr>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Xavier Guimard <x.guimard@free.fr>'
 build_requires:
-    Test::Most:  0
-requires:
-    IO::Socket::SSL:  1.831
-    Net::SMTP:        0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-recommends:
-    IO::Socket::SSL:  1.831
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Server-Mail
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '1.831'
+  Net::SMTP: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/rs/net-server-mail
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
