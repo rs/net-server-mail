@@ -190,7 +190,7 @@ deprecated to override this reply.
 
 You can rebuild extension list with get_extensions() method.
 
-Exemple:
+Example:
 
     my @extends;
     foreach my $extend ($esmtp->get_extensions())
