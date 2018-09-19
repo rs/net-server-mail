@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.26  Wed Sep 19 21:36:42 2018
+	- Use a 4096 bits certificate for tests (thanks to Damyan Ivanov for
+	  the patch and Debian CI team for autopkgtest which found the problem)
+
 0.25  Thu Sep 13 22:35:23 2018
 	- Clean RT#127081
 
