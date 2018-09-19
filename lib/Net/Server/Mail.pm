@@ -11,7 +11,7 @@ use Errno;
 
 use constant HOSTNAME => hostname();
 
-$Net::Server::Mail::VERSION = '0.25';
+$Net::Server::Mail::VERSION = '0.26';
 
 =pod
 
