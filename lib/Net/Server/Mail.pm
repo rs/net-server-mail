@@ -539,7 +539,7 @@ sub process_operation {
 sub process_command {
     my ( $self, $verb, $params ) = @_;
 
-    if ( exists $self->{verb}->{$verb} ) {
+    if ( defined $verb && exists $self->{verb}->{$verb} ) {
         my $action = $self->{verb}->{$verb};
         my $rv;
         if ( ref $action eq 'CODE' ) {
@@ -560,8 +560,9 @@ sub tokenize_command {
     my ( $self, $line ) = @_;
     $line =~ s/\r?\n$//s;
     $line =~ s/^\s+|\s+$//g;
+    $line =~ s/^(.*\s)/uc($1)/ge;
     my ( $verb, $params ) = split ' ', $line, 2;
-    return ( uc($verb), $params );
+    return ( $verb, $params );
 }
 
 sub reply {
