@@ -560,8 +560,8 @@ sub tokenize_command {
     my ( $self, $line ) = @_;
     $line =~ s/\r?\n$//s;
     $line =~ s/^\s+|\s+$//g;
-    $line =~ s/^(.*\s)/uc($1)/ge;
     my ( $verb, $params ) = split ' ', $line, 2;
+    $verb = uc($verb) if defined($verb);
     return ( $verb, $params );
 }
 
