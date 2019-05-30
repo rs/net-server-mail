@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.27  Fri Mar 29 11:11:42 2019
+	- Fix incorrect behaviour on empty line
+
 0.26  Wed Sep 19 21:36:42 2018
 	- Use a 4096 bits certificate for tests (thanks to Damyan Ivanov for
 	  the patch and Debian CI team for autopkgtest which found the problem)
