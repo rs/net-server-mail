@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Server::Mail.
 
+0.28  Sat Jun 1 09:09:11 2019
+	- Don't upper case on undefined commands (Closes: #15). Thanks to
+	  Tomasz Kolaj
+
 0.27  Fri Mar 29 11:11:42 2019
 	- Fix incorrect behaviour on empty line
 
